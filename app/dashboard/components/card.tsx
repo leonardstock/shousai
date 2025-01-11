@@ -1,5 +1,9 @@
 export const Card = ({ children }: { children: React.ReactNode }) => {
-    return <div className='w-full p-6 space-y-6'>{children}</div>;
+    return (
+        <div className='w-full p-6 space-y-6 bg-white rounded-lg border border-gray-200'>
+            {children}
+        </div>
+    );
 };
 
 export const CardHeader = ({
