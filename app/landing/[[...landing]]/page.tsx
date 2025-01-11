@@ -20,6 +20,7 @@ export default function LandingPage() {
                 <div className='text-center'>
                     <h1 className='text-4xl sm:text-5xl font-bold text-gray-900 mb-6'>
                         Reduce Your AI Costs
+                        {/* by 30-40% */}
                     </h1>
                     <p className='text-xl text-gray-600 max-w-2xl mx-auto mb-8'>
                         Monitor and optimize your AI spending across OpenAI,
@@ -61,7 +62,7 @@ export default function LandingPage() {
                     <p className='text-center text-gray-600 mb-8'>
                         Companies using AI are spending thousands on API calls
                     </p>
-                    <div className='grid grid-cols-1 md:grid-cols-3 gap-8 text-center'>
+                    <div className='grid grid-cols-1 gap-8 text-center'>
                         <div>
                             <div className='text-3xl font-bold text-gray-900'>
                                 $5,000+
@@ -70,14 +71,14 @@ export default function LandingPage() {
                                 Average Monthly AI Spend
                             </div>
                         </div>
-                        <div>
+                        {/* <div>
                             <div className='text-3xl font-bold text-gray-900'>
                                 35%
                             </div>
                             <div className='text-gray-600'>
                                 Average Cost Reduction
                             </div>
-                        </div>
+                        </div> */}
                         <div>
                             <div className='text-3xl font-bold text-gray-900'>
                                 24hrs
