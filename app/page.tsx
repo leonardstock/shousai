@@ -1,9 +1,14 @@
-import Dashboard from "./dashboard/page";
+import { auth } from "@clerk/nextjs/server";
+import { redirect } from "next/navigation";
+import LandingPage from "./landing/[[...landing]]/page";
 
-export default function Home() {
-    return (
-        <div>
-            <Dashboard />
-        </div>
-    );
+export default async function Home() {
+    const { userId } = await auth();
+
+    // If user is logged in, redirect to dashboard
+    if (userId) {
+        redirect("/dashboard");
+    }
+
+    return <LandingPage />;
 }
