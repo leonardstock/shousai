@@ -139,8 +139,8 @@ export default function LandingPage() {
                         Ready to optimize your AI costs?
                     </h2>
                     <p className='text-gray-600 mb-8'>
-                        Join the beta program and get 3 months free when we
-                        launch.
+                        Join the beta program and get the first month free when
+                        we launch.
                     </p>
                     <button
                         onClick={() =>
