@@ -22,6 +22,9 @@ export default function RootLayout({
     return (
         <ClerkProvider>
             <html lang='en'>
+                <head>
+                    <title>Shousai</title>
+                </head>
                 <body className={`${inter.className} antialiased`}>
                     <TopBar />
                     {children}
