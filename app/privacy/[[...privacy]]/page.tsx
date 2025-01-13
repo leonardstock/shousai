@@ -1,4 +1,4 @@
-const Privacy = () => {
+const PrivacyPage = () => {
     return (
         <div className='min-h-screen'>
             <h1>Privacy</h1>
@@ -6,4 +6,4 @@ const Privacy = () => {
     );
 };
 
-export default Privacy;
+export default PrivacyPage;

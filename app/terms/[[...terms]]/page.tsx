@@ -1,9 +1,9 @@
-const Terms = () => {
+const TermsPage = () => {
     return (
         <div className='min-h-screen'>
-            <h1>Terms</h1>
+            <h1>TermsPage</h1>
         </div>
     );
 };
 
-export default Terms;
+export default TermsPage;
