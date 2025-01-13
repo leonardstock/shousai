@@ -10,8 +10,10 @@ export default function LandingPage() {
     const [submitted, setSubmitted] = useState<boolean>(false);
 
     const handleSubmit = async () => {
-        const success = await handleEarlyAccessSubmit(email);
-        setSubmitted(success);
+        if (email !== "") {
+            const success = await handleEarlyAccessSubmit(email);
+            setSubmitted(success);
+        }
     };
 
     return (
