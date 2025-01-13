@@ -1,6 +1,7 @@
 "use client";
 
 import { handleEarlyAccessSubmit } from "@/app/actions";
+import Footer from "@/components/layout/Footer";
 import { ArrowRight, CheckCircle, LineChart, Shield, Zap } from "lucide-react";
 import { useState } from "react";
 
@@ -151,6 +152,7 @@ export default function LandingPage() {
                     </button>
                 </div>
             </div>
+            <Footer />
         </div>
     );
 }
