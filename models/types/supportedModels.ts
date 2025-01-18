@@ -1,0 +1,32 @@
+// TODO: write an ai agent that automatically pulls the pricing data from the above object every 2 hours
+
+export const MODEL_PRICING = {
+    // OpenAI Models
+    "gpt-4-turbo-preview": {
+        input: 0.01,
+        output: 0.03,
+    },
+    "gpt-4": {
+        input: 0.03,
+        output: 0.06,
+    },
+    "gpt-3.5-turbo": {
+        input: 0.0005,
+        output: 0.0015,
+    },
+    "gpt-3.5-turbo-instruct": {
+        input: 0.0005,
+        output: 0.0015,
+    },
+    // Anthropic Models
+    "claude-3-opus-20240229": {
+        input: 0.015,
+        output: 0.075,
+    },
+    "claude-3-sonnet-20240229": {
+        input: 0.003,
+        output: 0.015,
+    },
+} as const;
+
+export type SupportedModel = keyof typeof MODEL_PRICING;
