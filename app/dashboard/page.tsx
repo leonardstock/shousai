@@ -1,146 +1,186 @@
+"use client";
+
 import React from "react";
 import {
+    LineChart,
+    Line,
+    XAxis,
+    YAxis,
+    CartesianGrid,
+    Tooltip,
+    Legend,
+} from "recharts";
+import {
     Card,
-    CardContent,
     CardHeader,
     CardTitle,
-} from "@/app/dashboard/components/card";
-// import {
-//     LineChart,
-//     Line,
-//     XAxis,
-//     YAxis,
-//     CartesianGrid,
-//     Tooltip,
-//     ResponsiveContainer,
-// } from "recharts";
-import { AlertCircle, TrendingUp, DollarSign, Box } from "lucide-react";
+    CardContent,
+} from "@/components/shared/Card";
+import { Alert, AlertDescription } from "@/components/shared/Alert";
+import { DollarSign, TrendingDown, Zap } from "lucide-react";
+import { PromptOptimizer } from "@/lib/optimization/prompt";
 
-const Dashboard = () => {
-    // Sample data - would come from actual API tracking
-    const costData = [
-        { date: "2024-01", openai: 520, anthropic: 320, cohere: 150 },
-        { date: "2024-02", openai: 680, anthropic: 450, cohere: 220 },
-        { date: "2024-03", openai: 750, anthropic: 580, cohere: 280 },
-    ];
+// Sample data - replace with real metrics from your optimization tests
+const data = [
+    { date: "2024-01-01", originalCost: 100, optimizedCost: 100 },
+    { date: "2024-01-02", originalCost: 120, optimizedCost: 95 },
+    { date: "2024-01-03", originalCost: 115, optimizedCost: 88 },
+    { date: "2024-01-04", originalCost: 130, optimizedCost: 92 },
+    { date: "2024-01-05", originalCost: 125, optimizedCost: 85 },
+];
 
-    const alerts = [
-        { id: 1, type: "warning", message: "GPT-4 usage spike in Project A" },
-        { id: 2, type: "alert", message: "Monthly budget 85% utilized" },
-    ];
-
-    const totalSpend = costData.reduce(
-        (acc, curr) => acc + curr.openai + curr.anthropic + curr.cohere,
+const CostDashboard = () => {
+    // Calculate savings metrics
+    const totalOriginalCost = data.reduce(
+        (sum, day) => sum + day.originalCost,
         0
     );
+    const totalOptimizedCost = data.reduce(
+        (sum, day) => sum + day.optimizedCost,
+        0
+    );
+    const totalSaved = totalOriginalCost - totalOptimizedCost;
+    const savingsPercentage = ((totalSaved / totalOriginalCost) * 100).toFixed(
+        1
+    );
+
+    async function optimizationDemo() {
+        const samplePrompts = [
+            "Please can you tell me in detail about how to make a sandwich if possible thanks",
+            "I would like you to explain in order to help me understand the process of photosynthesis due to the fact that I am studying biology",
+            "At this point in time I need you to analyze this data",
+        ];
+
+        // Single prompt optimization
+        const result = PromptOptimizer.optimize(samplePrompts[2]);
+        console.log("Original prompt:", samplePrompts[2]);
+        console.log("Optimized prompt:", result.optimizedPrompt);
+        console.log("Tokens saved:", result.savings);
+        console.log("Optimizations applied:", result.optimizations);
+
+        // Analyze prompt history
+        const analysis = await PromptOptimizer.analyzePromptHistory(
+            samplePrompts
+        );
+        console.log("Total tokens saved:", analysis.totalSaved);
+        console.log("Average savings per prompt:", analysis.averageSavings);
+        console.log("Optimization success rate:", analysis.optimizationRate);
+        console.log("Recommendations:", analysis.recommendations);
+    }
 
     return (
-        <div className='w-full p-6 space-y-6'>
+        <div className='w-full max-w-6xl mx-auto p-4 space-y-6'>
             {/* Summary Cards */}
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
+            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                 <Card>
-                    <CardHeader className='flex flex-row items-center justify-between pb-2'>
+                    <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                         <CardTitle className='text-sm font-medium'>
-                            Total Spend
+                            Total Cost Savings
                         </CardTitle>
-                        <DollarSign className='w-4 h-4 text-gray-500' />
+                        <DollarSign className='h-4 w-4 text-green-500' />
                     </CardHeader>
                     <CardContent>
                         <div className='text-2xl font-bold'>
-                            ${totalSpend.toLocaleString()}
+                            ${totalSaved.toFixed(2)}
                         </div>
-                        <p className='text-xs text-gray-500'>
-                            Current billing period
+                        <p className='text-xs text-muted-foreground'>
+                            Over last 5 days
                         </p>
                     </CardContent>
                 </Card>
 
                 <Card>
-                    <CardHeader className='flex flex-row items-center justify-between pb-2'>
+                    <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                         <CardTitle className='text-sm font-medium'>
-                            Active Projects
+                            Savings Percentage
                         </CardTitle>
-                        <Box className='w-4 h-4 text-gray-500' />
+                        <TrendingDown className='h-4 w-4 text-blue-500' />
                     </CardHeader>
                     <CardContent>
-                        <div className='text-2xl font-bold'>12</div>
-                        <p className='text-xs text-gray-500'>
-                            Using AI services
+                        <div className='text-2xl font-bold'>
+                            {savingsPercentage}%
+                        </div>
+                        <p className='text-xs text-muted-foreground'>
+                            Average reduction
                         </p>
                     </CardContent>
                 </Card>
 
                 <Card>
-                    <CardHeader className='flex flex-row items-center justify-between pb-2'>
+                    <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
                         <CardTitle className='text-sm font-medium'>
-                            Cost Trend
+                            Optimizations Applied
                         </CardTitle>
-                        <TrendingUp className='w-4 h-4 text-gray-500' />
+                        <Zap className='h-4 w-4 text-yellow-500' />
                     </CardHeader>
                     <CardContent>
-                        <div className='text-2xl font-bold'>+24%</div>
-                        <p className='text-xs text-gray-500'>vs last month</p>
+                        <div className='text-2xl font-bold'>3</div>
+                        <p className='text-xs text-muted-foreground'>
+                            Active optimizations
+                        </p>
                     </CardContent>
                 </Card>
             </div>
 
-            {/* Cost Chart */}
+            {/* Cost Trend Chart */}
             <Card>
                 <CardHeader>
-                    <CardTitle>Cost Distribution</CardTitle>
+                    <CardTitle>Cost Trend Analysis</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className='h-[300px]'>
-                        {/* <ResponsiveContainer width='100%' height='100%'>
-                            <LineChart data={costData}>
-                                <CartesianGrid strokeDasharray='3 3' />
-                                <XAxis dataKey='date' />
-                                <YAxis />
-                                <Tooltip />
-                                <Line
-                                    type='monotone'
-                                    dataKey='openai'
-                                    stroke='#0ea5e9'
-                                    name='OpenAI'
-                                />
-                                <Line
-                                    type='monotone'
-                                    dataKey='anthropic'
-                                    stroke='#8b5cf6'
-                                    name='Anthropic'
-                                />
-                                <Line
-                                    type='monotone'
-                                    dataKey='cohere'
-                                    stroke='#10b981'
-                                    name='Cohere'
-                                />
-                            </LineChart>
-                        </ResponsiveContainer> */}
+                    <div className='h-[300px] w-full'>
+                        <LineChart
+                            width={800}
+                            height={300}
+                            data={data}
+                            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                            <CartesianGrid strokeDasharray='3 3' />
+                            <XAxis dataKey='date' />
+                            <YAxis />
+                            <Tooltip />
+                            <Legend />
+                            <Line
+                                type='monotone'
+                                dataKey='originalCost'
+                                stroke='#ff0000'
+                                name='Original Cost'
+                            />
+                            <Line
+                                type='monotone'
+                                dataKey='optimizedCost'
+                                stroke='#00ff00'
+                                name='Optimized Cost'
+                            />
+                        </LineChart>
                     </div>
                 </CardContent>
             </Card>
 
-            {/* Alerts */}
-            <Card>
-                <CardHeader>
-                    <CardTitle>Alerts</CardTitle>
-                </CardHeader>
-                <CardContent>
-                    <div className='space-y-4'>
-                        {alerts.map((alert) => (
-                            <div
-                                key={alert.id}
-                                className='flex items-center space-x-2 text-sm'>
-                                <AlertCircle className='w-4 h-4 text-amber-500' />
-                                <span>{alert.message}</span>
-                            </div>
-                        ))}
+            {/* Optimization Alerts */}
+            <Alert>
+                <AlertDescription>
+                    <div className='flex flex-col space-y-2'>
+                        <div className='font-medium'>Active Optimizations:</div>
+                        <ul className='list-disc pl-4'>
+                            <li>
+                                Prompt length optimization reducing token usage
+                                by 15%
+                            </li>
+                            <li>
+                                Automatic model downgrading for simple tasks
+                                saving 25%
+                            </li>
+                            <li>
+                                Response caching preventing duplicate API calls
+                            </li>
+                        </ul>
                     </div>
-                </CardContent>
-            </Card>
+                </AlertDescription>
+            </Alert>
+
+            <button onClick={optimizationDemo}>Run Optimization Demo</button>
         </div>
     );
 };
 
-export default Dashboard;
+export default CostDashboard;
