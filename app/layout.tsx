@@ -20,7 +20,13 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <ClerkProvider>
+        // TODO: unhide this once tested
+        <ClerkProvider
+            appearance={{
+                elements: {
+                    footer: "hidden",
+                },
+            }}>
             <html lang='en'>
                 <body className={`${inter.className} antialiased`}>
                     <TopBar />

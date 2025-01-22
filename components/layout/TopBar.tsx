@@ -1,7 +1,8 @@
 import { signInEnabled } from "@/global";
-import { SignedIn, SignedOut, SignInButton, UserButton } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
+import CustomUserButton from "./CustomUserButton";
 
 const TopBar = async () => {
     const { userId } = await auth();
@@ -38,7 +39,7 @@ const TopBar = async () => {
                             <SignInButton />
                         </SignedOut>
                         <SignedIn>
-                            <UserButton />
+                            <CustomUserButton />
                         </SignedIn>
                     </>
                 )}

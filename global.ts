@@ -1,1 +1,1 @@
-export const signInEnabled = false;
+export const signInEnabled = true;
