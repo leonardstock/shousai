@@ -13,27 +13,63 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model UsageLog {
-  id          String   @id @default(cuid())
-  createdAt   DateTime @default(now())
-  userId      String
-  provider    String
-  model       String
-  inputTokens Int
-  outputTokens Int
-  cost        Float
-  success     Boolean
-}
-
 model EarlyAccess {
   id        String   @id @default(cuid())
   email     String   @unique
   createdAt DateTime @default(now())
 }
 
+model ApiKey {
+  id             String       @id @default(cuid())
+  key            String       @unique
+  name           String
+  organizationId String
+  organization   Organization @relation(fields: [organizationId], references: [id])
+  createdAt      DateTime     @default(now())
+  lastUsed       DateTime     @default(now())
+  enabled        Boolean      @default(true)
+  usageLimit     Int?
+  usageLogs      UsageLog[]
+  deletedAt      DateTime?
+
+  @@index([key])
+  @@index([organizationId])
+}
+
+model Organization {
+  id        String   @id @default(cuid())
+  name      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  members   User[]   @relation("OrganizationMembers")
+  apiKeys   ApiKey[]
+}
+
 model User {
-  id            String      @id
-  email         String      @unique
-  createdAt     DateTime    @default(now())
-  updatedAt     DateTime    @updatedAt
+  id             String        @id @default(cuid())
+  email          String        @unique
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  organizationId String?
+  organization   Organization? @relation("OrganizationMembers", fields: [organizationId], references: [id])
+  UsageLog       UsageLog[]
+}
+
+model UsageLog {
+  id           String   @id @default(cuid())
+  createdAt    DateTime @default(now())
+  apiKeyId     String
+  apiKey       ApiKey   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
+  userId       String
+  user         User     @relation(fields: [userId], references: [id])
+  provider     String
+  model        String
+  inputTokens  Int
+  outputTokens Int
+  cost         Float
+  success      Boolean
+  cached       Boolean
+
+  @@index([apiKeyId, createdAt])
+  @@index([createdAt])
 }
