@@ -29,7 +29,7 @@ const ApiKeysPage = () => {
     const fetchKeys = async () => {
         try {
             const token = await getToken();
-            const response = await fetch("/api/keys", {
+            const response = await fetch("/api/v1/keys", {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
@@ -57,7 +57,7 @@ const ApiKeysPage = () => {
         setCreating(true);
         try {
             const token = await getToken();
-            const response = await fetch("/api/keys", {
+            const response = await fetch("/api/v1/keys", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
