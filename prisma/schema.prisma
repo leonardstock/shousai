@@ -20,20 +20,20 @@ model EarlyAccess {
 }
 
 model ApiKey {
-  id             String       @id @default(cuid())
-  key            String       @unique
-  name           String
-  organizationId String
-  organization   Organization @relation(fields: [organizationId], references: [id])
-  createdAt      DateTime     @default(now())
-  lastUsed       DateTime     @default(now())
-  enabled        Boolean      @default(true)
-  usageLimit     Int?
-  usageLogs      UsageLog[]
-  deletedAt      DateTime?
+  id         String     @id @default(cuid())
+  key        String     @unique
+  name       String
+  userId     String     @unique
+  user       User       @relation(fields: [userId], references: [id])
+  createdAt  DateTime   @default(now())
+  lastUsed   DateTime   @default(now())
+  enabled    Boolean    @default(true)
+  usageLimit Int?
+  usageLogs  UsageLog[]
+  deletedAt  DateTime?
 
   @@index([key])
-  @@index([organizationId])
+  @@index([userId])
 }
 
 model Organization {
@@ -42,7 +42,6 @@ model Organization {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   members   User[]   @relation("OrganizationMembers")
-  apiKeys   ApiKey[]
 }
 
 model User {
@@ -52,7 +51,8 @@ model User {
   updatedAt      DateTime      @updatedAt
   organizationId String?
   organization   Organization? @relation("OrganizationMembers", fields: [organizationId], references: [id])
-  UsageLog       UsageLog[]
+  usageLogs      UsageLog[]
+  apiKey         ApiKey?
 }
 
 model UsageLog {

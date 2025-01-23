@@ -10,7 +10,7 @@ const CustomUserButton = () => {
             <UserButton>
                 <UserButton.UserProfilePage
                     label='Manage API Keys'
-                    labelIcon={<KeyRound />}
+                    labelIcon={<KeyRound height={"1rem"} width={"1rem"} />}
                     url='api-keys'>
                     <ApiKeysPage />
                 </UserButton.UserProfilePage>

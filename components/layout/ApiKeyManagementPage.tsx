@@ -3,7 +3,6 @@
 
 import React, { useState, useEffect } from "react";
 import { Plus, Copy, KeyRound } from "lucide-react";
-import { useAuth } from "@clerk/nextjs";
 // import { useToast } from "@/components/ui/use-toast";
 import { Input } from "../shared/Input";
 import { Button } from "../shared/Button";
@@ -21,21 +20,21 @@ const ApiKeysPage = () => {
     const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
     const [loading, setLoading] = useState(true);
     const [creating, setCreating] = useState(false);
-    const [newKeyName, setNewKeyName] = useState("");
-    const [usageLimit, setUsageLimit] = useState("1000");
-    // const { toast } = useToast();
-    const { getToken } = useAuth();
+    const [newKeyName, setNewKeyName] = useState("test");
+    const [usageLimit, setUsageLimit] = useState("1");
 
     const fetchKeys = async () => {
         try {
-            const token = await getToken();
-            const response = await fetch("/api/v1/keys", {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-            if (!response.ok) throw new Error("Failed to fetch keys");
+            const response = await fetch("/api/v1/keys");
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error("Error response:", errorText);
+                throw new Error(`Failed to fetch keys: ${response.status}`);
+            }
+
             const data = await response.json();
+
             setApiKeys(data);
         } catch (error) {
             // toast({
@@ -56,25 +55,19 @@ const ApiKeysPage = () => {
         if (!newKeyName) return;
         setCreating(true);
         try {
-            const token = await getToken();
             const response = await fetch("/api/v1/keys", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                     name: newKeyName,
-                    usageLimit: parseInt(usageLimit),
                 }),
             });
 
             if (!response.ok) throw new Error("Failed to create key");
-            const newKey = await response.json();
 
-            setApiKeys([...apiKeys, newKey]);
-            setNewKeyName("");
-            setUsageLimit("1000");
+            fetchKeys();
 
             // toast({
             //     title: "API Key Created",
@@ -123,27 +116,22 @@ const ApiKeysPage = () => {
             </div>
 
             <div className='space-y-4'>
-                <div className='flex gap-4'>
-                    <Input
-                        placeholder='Key name'
-                        value={newKeyName}
-                        onChange={(e) => setNewKeyName(e.target.value)}
-                        className='flex-1'
-                    />
-                    <Input
-                        type='number'
-                        placeholder='Usage limit'
-                        value={usageLimit}
-                        onChange={(e) => setUsageLimit(e.target.value)}
-                        className='w-32'
-                    />
-                    <Button
-                        onClick={createNewKey}
-                        disabled={creating || !newKeyName}>
-                        <Plus className='w-4 h-4 mr-2' />
-                        Create Key
-                    </Button>
-                </div>
+                {apiKeys.length === 0 && (
+                    <div className='flex gap-4'>
+                        <Input
+                            placeholder='Key name'
+                            value={newKeyName}
+                            onChange={(e) => setNewKeyName(e.target.value)}
+                            className='flex-1'
+                        />
+                        <Button
+                            onClick={createNewKey}
+                            disabled={creating || !newKeyName}>
+                            <Plus className='w-4 h-4 mr-2' />
+                            Create Key
+                        </Button>
+                    </div>
+                )}
 
                 <div className='space-y-4'>
                     {apiKeys.map((key) => (
@@ -151,27 +139,17 @@ const ApiKeysPage = () => {
                             key={key.id}
                             className='p-4 border rounded-lg space-y-3'>
                             <div className='flex items-center justify-between'>
-                                <div>
-                                    <h3 className='font-medium'>{key.name}</h3>
+                                <h3 className='font-medium'>{key.name}</h3>
+                                <div className='flex flex-col items-end gap-2'>
                                     <p className='text-sm text-gray-500'>
-                                        Created {formatDate(key.createdAt)}
+                                        Created: {formatDate(key.createdAt)}
+                                    </p>
+                                    <p className='text-sm text-gray-500'>
                                         {key.lastUsed &&
-                                            ` • Last used ${formatDate(
+                                            `Last used: ${formatDate(
                                                 key.lastUsed
                                             )}`}
                                     </p>
-                                </div>
-                                <div className='flex items-center gap-2'>
-                                    <span className='text-sm text-gray-500'>
-                                        Usage: {key.usageLimit.toLocaleString()}{" "}
-                                        requests/month
-                                    </span>
-                                    <Button
-                                        variant='ghost'
-                                        size='sm'
-                                        onClick={() => copyKey(key.id)}>
-                                        <Copy className='w-4 h-4' />
-                                    </Button>
                                 </div>
                             </div>
 

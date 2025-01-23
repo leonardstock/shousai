@@ -4,26 +4,26 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 
 export async function POST(req: Request) {
-    const { userId, orgId } = await auth();
-    if (!userId || !orgId) {
+    const { userId } = await auth();
+    if (!userId) {
         return new NextResponse("Unauthorized", { status: 401 });
     }
 
-    const { name, usageLimit } = await req.json();
+    const { name } = await req.json();
 
-    const apiKey = await ApiKeyManager.createApiKey(orgId, name, usageLimit);
+    const apiKey = await ApiKeyManager.createApiKey(userId, name);
 
     return NextResponse.json(apiKey);
 }
 
 export async function GET() {
-    const { userId, orgId } = await auth();
-    if (!userId || !orgId) {
+    const { userId } = await auth();
+    if (!userId) {
         return new NextResponse("Unauthorized", { status: 401 });
     }
 
     const keys = await prisma.apiKey.findMany({
-        where: { organizationId: orgId },
+        where: { userId: userId },
         select: {
             id: true,
             name: true,

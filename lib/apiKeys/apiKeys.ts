@@ -4,7 +4,7 @@ import { prisma } from "../db/prisma";
 export class ApiKeyManager {
     // Generate a new API key
     static async createApiKey(
-        organizationId: string,
+        userId: string,
         name: string,
         usageLimit?: number
     ) {
@@ -18,7 +18,7 @@ export class ApiKeyManager {
             data: {
                 key: hashedKey,
                 name,
-                organizationId,
+                userId,
                 usageLimit,
             },
         });
