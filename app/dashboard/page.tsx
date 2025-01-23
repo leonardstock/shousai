@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import {
     LineChart,
     Line,
@@ -30,6 +30,11 @@ const data = [
 ];
 
 const CostDashboard = () => {
+    const [isClient, setIsClient] = useState(false);
+
+    useEffect(() => {
+        setIsClient(true);
+    }, []);
     // Calculate savings metrics
     const totalOriginalCost = data.reduce(
         (sum, day) => sum + day.originalCost,
@@ -129,29 +134,36 @@ const CostDashboard = () => {
                 </CardHeader>
                 <CardContent>
                     <div className='h-[300px] w-full'>
-                        <LineChart
-                            width={800}
-                            height={300}
-                            data={data}
-                            margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
-                            <CartesianGrid strokeDasharray='3 3' />
-                            <XAxis dataKey='date' />
-                            <YAxis />
-                            <Tooltip />
-                            <Legend />
-                            <Line
-                                type='monotone'
-                                dataKey='originalCost'
-                                stroke='#ff0000'
-                                name='Original Cost'
-                            />
-                            <Line
-                                type='monotone'
-                                dataKey='optimizedCost'
-                                stroke='#00ff00'
-                                name='Optimized Cost'
-                            />
-                        </LineChart>
+                        {isClient && (
+                            <LineChart
+                                width={800}
+                                height={300}
+                                data={data}
+                                margin={{
+                                    top: 5,
+                                    right: 30,
+                                    left: 20,
+                                    bottom: 5,
+                                }}>
+                                <CartesianGrid strokeDasharray='3 3' />
+                                <XAxis dataKey='date' />
+                                <YAxis />
+                                <Tooltip />
+                                <Legend />
+                                <Line
+                                    type='monotone'
+                                    dataKey='originalCost'
+                                    stroke='#ff0000'
+                                    name='Original Cost'
+                                />
+                                <Line
+                                    type='monotone'
+                                    dataKey='optimizedCost'
+                                    stroke='#00ff00'
+                                    name='Optimized Cost'
+                                />
+                            </LineChart>
+                        )}
                     </div>
                 </CardContent>
             </Card>
