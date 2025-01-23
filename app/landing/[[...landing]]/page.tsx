@@ -22,13 +22,12 @@ export default function LandingPage() {
             <div className='max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16'>
                 <div className='text-center'>
                     <h1 className='text-4xl sm:text-5xl font-bold text-gray-900 mb-6'>
-                        Stop Overpaying for AI API Calls
+                        Reduce Your AI Costs
                     </h1>
                     <p className='text-xl text-gray-600 max-w-2xl mx-auto mb-8'>
-                        Automatically detect wasteful API calls, optimize prompt
-                        lengths, and choose the right models. Perfect for
-                        startups using OpenAI, Anthropic, and other LLM
-                        providers.
+                        Monitor and optimize your AI spending across OpenAI,
+                        Anthropic, and other providers. Get real-time alerts and
+                        intelligent optimization suggestions.
                     </p>
 
                     <div className='max-w-md mx-auto'>
