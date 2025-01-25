@@ -8,15 +8,10 @@ const isUnProtectedRoute = createRouteMatcher([
     "/terms(.*)",
     "/signin(.*)",
     "/signup(.*)",
+    "/api/webhooks/(.*)",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
-    const url = req.nextUrl.pathname;
-
-    if (url === "/api/webhooks/clerk") {
-        return; // Skip authentication for this route
-    }
-
     if (!isUnProtectedRoute(req)) await auth.protect();
 });
 

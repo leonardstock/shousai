@@ -1,4 +1,3 @@
-import { signInEnabled } from "@/global";
 import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
@@ -33,16 +32,14 @@ const TopBar = async () => {
             </div>
             <div className='flex flex-row gap-4 text-white'>
                 {!userId && <Link href='/pricing'>Pricing</Link>}
-                {signInEnabled && (
-                    <>
-                        <SignedOut>
-                            <SignInButton />
-                        </SignedOut>
-                        <SignedIn>
-                            <CustomUserButton />
-                        </SignedIn>
-                    </>
-                )}
+                <>
+                    <SignedOut>
+                        <SignInButton />
+                    </SignedOut>
+                    <SignedIn>
+                        <CustomUserButton />
+                    </SignedIn>
+                </>
             </div>
         </div>
     );

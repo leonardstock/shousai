@@ -1,1 +1,1 @@
-export const signInEnabled = true;
+export const upgradeDisabled = true;

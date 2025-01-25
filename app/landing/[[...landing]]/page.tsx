@@ -1,19 +1,12 @@
 "use client";
 
-import { handleEarlyAccessSubmit } from "@/app/actions";
 import Footer from "@/components/layout/Footer";
-import { ArrowRight, CheckCircle, LineChart, Shield, Zap } from "lucide-react";
-import { useState } from "react";
+import { ArrowRight, LineChart, Shield, Zap } from "lucide-react";
+import { redirect } from "next/navigation";
 
 export default function LandingPage() {
-    const [email, setEmail] = useState<string>("");
-    const [submitted, setSubmitted] = useState<boolean>(false);
-
     const handleSubmit = async () => {
-        if (email !== "") {
-            const success = await handleEarlyAccessSubmit(email);
-            setSubmitted(success);
-        }
+        redirect("/signup");
     };
 
     return (
@@ -31,15 +24,7 @@ export default function LandingPage() {
                     </p>
 
                     <div className='max-w-md mx-auto'>
-                        <div className='flex flex-col md:flex-row gap-2'>
-                            <input
-                                type='email'
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder='Enter your work email'
-                                className='flex-1 px-4 py-2 rounded-lg border focus:outline-none focus:ring-2 focus:ring-blue-500 text-black'
-                                required
-                            />
+                        <div className='flex flex-col md:flex-row items-center justify-center'>
                             <button
                                 onClick={handleSubmit}
                                 className='px-6 py-2 border-gradient bg-white text-white rounded-lg font-medium hover:bg-blue-700 flex items-center gap-2 justify-center'>
@@ -48,13 +33,6 @@ export default function LandingPage() {
                             </button>
                         </div>
                     </div>
-
-                    {submitted && (
-                        <div className='mt-4 text-green-600 flex items-center justify-center gap-2'>
-                            <CheckCircle className='w-5 h-5' />
-                            <span>Thanks! We&apos;ll be in touch soon.</span>
-                        </div>
-                    )}
                 </div>
             </div>
 
