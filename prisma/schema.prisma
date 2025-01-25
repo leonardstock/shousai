@@ -13,6 +13,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum SubscriptionTier {
+  FREE
+  PRO
+}
+
+model Subscription {
+  id                   String           @id @default(cuid())
+  tier                 SubscriptionTier @default(FREE)
+  stripeCustomerId     String?          @unique
+  stripeSubscriptionId String?          @unique
+  userId               String           @unique
+  user                 User             @relation(fields: [userId], references: [id])
+  startDate            DateTime         @default(now())
+  endDate              DateTime?
+  status               String           @default("active")
+
+  @@index([userId])
+}
+
 model EarlyAccess {
   id        String   @id @default(cuid())
   email     String   @unique
@@ -53,6 +72,7 @@ model User {
   organization   Organization? @relation("OrganizationMembers", fields: [organizationId], references: [id])
   usageLogs      UsageLog[]
   apiKey         ApiKey?
+  subscription   Subscription?
 }
 
 model UsageLog {
