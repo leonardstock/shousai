@@ -1,1 +1,1 @@
-export const upgradeDisabled = false;
+export const upgradeDisabled = true;
