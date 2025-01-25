@@ -60,6 +60,12 @@ export async function POST(req: Request) {
                 data: {
                     id: id,
                     email: primaryEmail,
+                    subscription: {
+                        create: {
+                            tier: "FREE",
+                            status: "active",
+                        },
+                    },
                 },
             });
 
