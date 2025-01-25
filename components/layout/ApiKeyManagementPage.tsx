@@ -20,8 +20,7 @@ const ApiKeysPage = () => {
     const [apiKeys, setApiKeys] = useState<ApiKey[]>([]);
     const [loading, setLoading] = useState(true);
     const [creating, setCreating] = useState(false);
-    const [newKeyName, setNewKeyName] = useState("test");
-    const [usageLimit, setUsageLimit] = useState("1");
+    const [newKeyName, setNewKeyName] = useState("");
 
     const fetchKeys = async () => {
         try {

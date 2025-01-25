@@ -16,3 +16,19 @@ export async function handleEarlyAccessSubmit(email: string) {
         return false;
     }
 }
+
+export async function getSubscriptionTier(userId: string) {
+    try {
+        const subscription = await prisma.subscription.findFirst({
+            where: { userId: userId },
+            select: {
+                tier: true,
+            },
+        });
+
+        return subscription?.tier;
+    } catch (error) {
+        console.error(error);
+        return "FREE";
+    }
+}

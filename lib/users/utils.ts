@@ -67,19 +67,24 @@ export async function upgradeUserSubscription(
 
 // Helper to check current subscription tier
 export async function getUserSubscriptionTier(userId: string) {
-    const user = await prisma.user.findUnique({
-        where: { id: userId },
-        select: {
-            subscription: {
-                select: {
-                    tier: true,
-                    status: true,
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                subscription: {
+                    select: {
+                        tier: true,
+                        status: true,
+                    },
                 },
             },
-        },
-    });
+        });
 
-    return user?.subscription?.tier || null;
+        return user?.subscription?.tier;
+    } catch (error) {
+        console.error(error);
+        return "FREE";
+    }
 }
 
 export async function canAccessFeature(
