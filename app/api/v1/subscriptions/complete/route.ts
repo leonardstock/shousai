@@ -7,7 +7,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 
 export async function POST(req: NextRequest) {
     try {
-        const { paymentIntentId, planId } = await req.json();
+        const { paymentIntentId, planId, user } = await req.json();
 
         // Verify payment intent
         const paymentIntent = await stripe.paymentIntents.retrieve(
@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
 
         // Create Stripe Customer
         const customer = await stripe.customers.create({
-            email: "user@example.com", // TODO: Replace with actual user email
+            email: user.emailAddresses[0].emailAddress,
             payment_method: paymentIntent.payment_method as string,
         });
 

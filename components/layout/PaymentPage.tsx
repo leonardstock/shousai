@@ -9,7 +9,7 @@ import {
     useStripe,
     useElements,
 } from "@stripe/react-stripe-js";
-import { useRouter } from "next/navigation";
+import { redirect } from "next/navigation";
 import axios from "axios";
 import { SubscriptionTier } from "@prisma/client";
 import { useUser } from "@clerk/nextjs";
@@ -31,9 +31,10 @@ const PaymentForm = ({
 }) => {
     const stripe = useStripe();
     const elements = useElements();
-    const router = useRouter();
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const { user } = useUser();
+    const userName = `${user?.firstName ?? ""} ${user?.lastName ?? ""}`;
 
     const handleSubmit = async (event: React.FormEvent) => {
         event.preventDefault();
@@ -58,7 +59,7 @@ const PaymentForm = ({
                 payment_method: {
                     card: elements.getElement(CardElement)!,
                     billing_details: {
-                        name: "Customer Name", // TODO: Collect actual customer name
+                        name: userName,
                     },
                 },
             });
@@ -73,10 +74,11 @@ const PaymentForm = ({
             await axios.post("/api/v1/subscriptions/complete", {
                 paymentIntentId: result.paymentIntent?.id,
                 planId,
+                user,
             });
 
             // Redirect to dashboard or show success
-            router.push("/dashboard");
+            redirect("/dashboard");
         } catch (err: any) {
             setError(
                 err.response?.data?.error || "An unexpected error occurred"
