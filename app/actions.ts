@@ -76,3 +76,27 @@ export async function downgradeUserSubscription(
         throw error;
     }
 }
+
+export async function getUserFromApiKey(apiKey: string) {
+    try {
+        const apiKeyRecord = await prisma.apiKey.findUnique({
+            where: {
+                key: apiKey,
+                enabled: true,
+            },
+            include: {
+                user: true,
+            },
+        });
+
+        if (!apiKeyRecord) return null;
+
+        return {
+            userId: apiKeyRecord.userId,
+            userDetails: apiKeyRecord.user,
+        };
+    } catch (error) {
+        console.error("API Key Lookup Error:", error);
+        return null;
+    }
+}

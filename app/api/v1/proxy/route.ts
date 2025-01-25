@@ -1,11 +1,11 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import { getUserFromApiKey } from "@/app/actions";
 import { ApiKeyManager } from "@/lib/apiKeys/apiKeys";
 import { createRequestCache } from "@/lib/cache/requestCache";
 import { prisma } from "@/lib/db/prisma";
 import { TokenCalculator } from "@/lib/tokens/calculator";
 import { CacheEntry } from "@/models/interfaces/cache";
 import { SupportedModel } from "@/models/types/supportedModels";
-import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -58,11 +58,6 @@ const PROVIDER_CONFIGS = {
 };
 
 export async function POST(req: Request) {
-    const { userId } = await auth();
-    if (!userId) {
-        return new NextResponse("Unauthorized", { status: 401 });
-    }
-
     try {
         const { apiKey, providerKey, provider, model, messages } =
             requestSchema.parse(await req.json());
@@ -75,6 +70,12 @@ export async function POST(req: Request) {
         if (!validKey) {
             return new NextResponse("Invalid API key", { status: 401 });
         }
+
+        const userInfo = await getUserFromApiKey(apiKey);
+        if (!userInfo) {
+            return new NextResponse("User not found", { status: 401 });
+        }
+        const userId = userInfo.userId;
 
         const cache = createRequestCache(process.env.UPSTASH_REDIS_REST_URL);
 
@@ -227,23 +228,23 @@ export async function POST(req: Request) {
     } catch (error) {
         console.error("Proxy error:", error);
 
-        try {
-            await prisma.usageLog.create({
-                data: {
-                    userId: userId!,
-                    model: "unknown",
-                    provider: "unknown",
-                    inputTokens: 0,
-                    outputTokens: 0,
-                    cost: 0,
-                    success: false,
-                    cached: false,
-                    apiKeyId: "",
-                },
-            });
-        } catch (logError) {
-            console.error("Failed to log error:", logError);
-        }
+        // try {
+        //     await prisma.usageLog.create({
+        //         data: {
+        //             userId: userId!,
+        //             model: "unknown",
+        //             provider: "unknown",
+        //             inputTokens: 0,
+        //             outputTokens: 0,
+        //             cost: 0,
+        //             success: false,
+        //             cached: false,
+        //             apiKeyId: "",
+        //         },
+        //     });
+        // } catch (logError) {
+        //     console.error("Failed to log error:", logError);
+        // }
 
         return new NextResponse(
             error instanceof z.ZodError

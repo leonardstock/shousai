@@ -9,6 +9,7 @@ const isUnProtectedRoute = createRouteMatcher([
     "/signin(.*)",
     "/signup(.*)",
     "/api/webhooks/(.*)",
+    "/api/v1/proxy/(.*)",
 ]);
 
 export default clerkMiddleware(async (auth, req) => {
