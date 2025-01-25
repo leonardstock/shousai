@@ -2,6 +2,11 @@ import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { WebhookEvent } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/db/prisma";
+import Stripe from "stripe";
+
+const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: "2024-12-18.acacia",
+});
 
 export async function POST(req: Request) {
     // Get the webhook signing secret from your environment variables
@@ -52,13 +57,15 @@ export async function POST(req: Request) {
 
     if (eventType === "user.created") {
         // const { id, email_addresses, ...attributes } = evt.data;
-        const { id, email_addresses } = evt.data;
+        const { id, email_addresses, first_name, last_name } = evt.data;
         const primaryEmail = email_addresses[0]?.email_address;
 
         try {
             await prisma.user.create({
                 data: {
                     id: id,
+                    firstName: first_name!,
+                    lastName: last_name!,
                     email: primaryEmail,
                     subscription: {
                         create: {
@@ -69,6 +76,11 @@ export async function POST(req: Request) {
                 },
             });
 
+            await stripe.customers.create({
+                email: primaryEmail,
+                name: `${first_name} ${last_name}`,
+            });
+
             return new Response("User created", { status: 200 });
         } catch (err) {
             console.error("Error creating user:", err);
@@ -77,7 +89,7 @@ export async function POST(req: Request) {
     }
 
     if (eventType === "user.updated") {
-        const { id, email_addresses } = evt.data;
+        const { id, email_addresses, first_name, last_name } = evt.data;
         const primaryEmail = email_addresses[0]?.email_address;
 
         try {
@@ -85,6 +97,8 @@ export async function POST(req: Request) {
                 where: { id: id },
                 data: {
                     email: primaryEmail,
+                    firstName: first_name!,
+                    lastName: last_name!,
                 },
             });
 
