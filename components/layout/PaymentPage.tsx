@@ -9,11 +9,14 @@ import {
     useStripe,
     useElements,
 } from "@stripe/react-stripe-js";
-import { redirect } from "next/navigation";
 import axios from "axios";
 import { SubscriptionTier } from "@prisma/client";
 import { useUser } from "@clerk/nextjs";
-import { getSubscriptionTier } from "@/app/actions";
+import {
+    downgradeUserSubscription,
+    getSubscriptionTier,
+    upgradeUserSubscription,
+} from "@/app/actions";
 import { upgradeDisabled } from "@/global";
 
 // Stripe initialization
@@ -25,9 +28,11 @@ const stripePromise = loadStripe(
 const PaymentForm = ({
     planPrice,
     planId,
+    onSubscriptionChange,
 }: {
     planPrice: number;
     planId: string;
+    onSubscriptionChange: () => void;
 }) => {
     const stripe = useStripe();
     const elements = useElements();
@@ -45,40 +50,57 @@ const PaymentForm = ({
         setError(null);
 
         try {
-            // Create payment intent
-            const { data } = await axios.post(
-                "/api/v1/payments/create-intent",
-                {
-                    amount: planPrice,
-                    planId,
-                }
-            );
-
-            // Confirm card payment
-            const result = await stripe.confirmCardPayment(data.clientSecret, {
-                payment_method: {
-                    card: elements.getElement(CardElement)!,
-                    billing_details: {
-                        name: userName,
+            if (planId === "FREE") {
+                await axios.delete("/api/v1/subscriptions/complete", {
+                    params: {
+                        userEmail: user!.emailAddresses[0].emailAddress,
                     },
-                },
-            });
+                });
 
-            if (result.error) {
-                setError(result.error.message || "Payment failed");
-                setLoading(false);
-                return;
+                downgradeUserSubscription(user!.id);
+
+                onSubscriptionChange();
+            } else {
+                // Create payment intent
+                const { data } = await axios.post(
+                    "/api/v1/payments/create-intent",
+                    {
+                        amount: planPrice,
+                        planId,
+                    }
+                );
+
+                // Confirm card payment
+                const result = await stripe.confirmCardPayment(
+                    data.clientSecret,
+                    {
+                        setup_future_usage: "off_session",
+                        payment_method: {
+                            card: elements.getElement(CardElement)!,
+                            billing_details: {
+                                name: userName,
+                            },
+                        },
+                    }
+                );
+
+                if (result.error) {
+                    setError(result.error.message || "Payment failed");
+                    setLoading(false);
+                    return;
+                }
+
+                // Complete subscription
+                await axios.post("/api/v1/subscriptions/complete", {
+                    paymentIntentId: result.paymentIntent?.id,
+                    planId,
+                    user,
+                });
+
+                upgradeUserSubscription(user!.id);
+
+                onSubscriptionChange();
             }
-
-            // Complete subscription
-            await axios.post("/api/v1/subscriptions/complete", {
-                paymentIntentId: result.paymentIntent?.id,
-                planId,
-                user,
-            });
-
-            // Redirect to dashboard or show success
-            redirect("/dashboard");
         } catch (err: any) {
             setError(
                 err.response?.data?.error || "An unexpected error occurred"
@@ -110,7 +132,11 @@ const PaymentForm = ({
                 type='submit'
                 disabled={loading || !stripe || upgradeDisabled}
                 className='w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600 disabled:bg-gray-400'>
-                {loading ? "Processing..." : "Upgrade"}
+                {loading
+                    ? "Processing..."
+                    : planId === "PRO"
+                    ? "Upgrade"
+                    : "Downgrade"}
             </button>
         </form>
     );
@@ -118,15 +144,18 @@ const PaymentForm = ({
 
 // Subscription Page
 export default function SubscriptionPage() {
-    const [currentTier, setCurrentTier] = useState<SubscriptionTier>("FREE");
+    const [currentTier, setCurrentTier] = useState<SubscriptionTier>();
+    const [loading, setLoading] = useState(true);
     const { user } = useUser();
 
-    useEffect(() => {
-        const handleSubscriptionTierLoad = async (userId: string) => {
-            const subscriptionTier = await getSubscriptionTier(userId);
-            setCurrentTier(subscriptionTier!);
-        };
+    const handleSubscriptionTierLoad = async (userId: string) => {
+        setLoading(true);
+        const subscriptionTier = await getSubscriptionTier(userId);
+        setCurrentTier(subscriptionTier!);
+        setLoading(false);
+    };
 
+    useEffect(() => {
         if (user) {
             handleSubscriptionTierLoad(user.id);
         }
@@ -198,11 +227,14 @@ export default function SubscriptionPage() {
                             ))}
                         </ul>
 
-                        {plan.id !== currentTier && (
+                        {plan.id !== currentTier && !loading && (
                             <Elements stripe={stripePromise}>
                                 <PaymentForm
                                     planPrice={plan.price}
                                     planId={plan.id}
+                                    onSubscriptionChange={() =>
+                                        handleSubscriptionTierLoad(user!.id)
+                                    }
                                 />
                             </Elements>
                         )}

@@ -2,11 +2,6 @@ import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { WebhookEvent } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/db/prisma";
-import Stripe from "stripe";
-
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-    apiVersion: "2024-12-18.acacia",
-});
 
 export async function POST(req: Request) {
     // Get the webhook signing secret from your environment variables
@@ -74,11 +69,6 @@ export async function POST(req: Request) {
                         },
                     },
                 },
-            });
-
-            await stripe.customers.create({
-                email: primaryEmail,
-                name: `${first_name} ${last_name}`,
             });
 
             return new Response("User created", { status: 200 });

@@ -32,3 +32,47 @@ export async function getSubscriptionTier(userId: string) {
         return "FREE";
     }
 }
+
+export async function upgradeUserSubscription(
+    userId: string,
+    stripeCustomerId?: string,
+    stripeSubscriptionId?: string
+) {
+    try {
+        return await prisma.subscription.update({
+            where: { userId },
+            data: {
+                tier: "PRO",
+                stripeCustomerId,
+                stripeSubscriptionId,
+                status: "active",
+                startDate: new Date(),
+            },
+        });
+    } catch (error) {
+        console.error("Error upgrading subscription:", error);
+        throw error;
+    }
+}
+
+export async function downgradeUserSubscription(
+    userId: string,
+    stripeCustomerId?: string,
+    stripeSubscriptionId?: string
+) {
+    try {
+        return await prisma.subscription.update({
+            where: { userId },
+            data: {
+                tier: "FREE",
+                stripeCustomerId,
+                stripeSubscriptionId,
+                status: "active",
+                startDate: new Date(),
+            },
+        });
+    } catch (error) {
+        console.error("Error downgrading subscription:", error);
+        throw error;
+    }
+}
