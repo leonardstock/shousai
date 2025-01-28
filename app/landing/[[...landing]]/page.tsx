@@ -27,7 +27,7 @@ export default function LandingPage() {
                         <div className='flex flex-col md:flex-row items-center justify-center'>
                             <button
                                 onClick={handleSubmit}
-                                className='px-6 py-2 border-gradient bg-white text-white rounded-lg font-medium hover:bg-blue-700 flex items-center gap-2 justify-center'>
+                                className='px-6 py-2 background-gradient bg-white text-white rounded-lg font-medium hover:bg-blue-700 flex items-center gap-2 justify-center'>
                                 Get Early Access
                                 <ArrowRight className='w-4 h-4' />
                             </button>
@@ -126,7 +126,7 @@ export default function LandingPage() {
                         onClick={() =>
                             window.scrollTo({ top: 0, behavior: "smooth" })
                         }
-                        className='px-8 py-3 border-gradient text-white rounded-lg font-medium hover:bg-blue-700'>
+                        className='px-8 py-3 background-gradient text-white rounded-lg font-medium hover:bg-blue-700'>
                         Get Started
                     </button>
                 </div>
