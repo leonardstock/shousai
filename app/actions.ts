@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/db/prisma";
+import { createHash } from "crypto";
 
 export async function handleEarlyAccessSubmit(email: string) {
     try {
@@ -79,9 +80,11 @@ export async function downgradeUserSubscription(
 
 export async function getUserFromApiKey(apiKey: string) {
     try {
+        const hashedKey = hashApiKey(apiKey);
+
         const apiKeyRecord = await prisma.apiKey.findUnique({
             where: {
-                key: apiKey,
+                key: hashedKey,
                 enabled: true,
             },
             include: {
@@ -99,4 +102,8 @@ export async function getUserFromApiKey(apiKey: string) {
         console.error("API Key Lookup Error:", error);
         return null;
     }
+}
+
+function hashApiKey(key: string) {
+    return createHash("sha256").update(key).digest("hex");
 }

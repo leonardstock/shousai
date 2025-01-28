@@ -44,24 +44,24 @@ export class ApiKeyManager {
         }
 
         // Check usage limits if they exist
-        if (apiKey.usageLimit) {
-            const startOfMonth = new Date();
-            startOfMonth.setDate(1);
-            startOfMonth.setHours(0, 0, 0, 0);
+        // if (apiKey.usageLimit) {
+        //     const startOfMonth = new Date();
+        //     startOfMonth.setDate(1);
+        //     startOfMonth.setHours(0, 0, 0, 0);
 
-            const monthlyUsage = await prisma.usageLog.count({
-                where: {
-                    apiKeyId: apiKey.id,
-                    createdAt: {
-                        gte: startOfMonth,
-                    },
-                },
-            });
+        //     const monthlyUsage = await prisma.usageLog.count({
+        //         where: {
+        //             apiKeyId: apiKey.id,
+        //             createdAt: {
+        //                 gte: startOfMonth,
+        //             },
+        //         },
+        //     });
 
-            if (monthlyUsage >= apiKey.usageLimit) {
-                return null;
-            }
-        }
+        //     if (monthlyUsage >= apiKey.usageLimit) {
+        //         return null;
+        //     }
+        // }
 
         // Update last used timestamp
         await prisma.apiKey.update({

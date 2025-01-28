@@ -6,6 +6,7 @@ import { Plus, Copy, KeyRound } from "lucide-react";
 // import { useToast } from "@/components/ui/use-toast";
 import { Input } from "../shared/Input";
 import { Button } from "../shared/Button";
+import { ApiKeyModal } from "../ui/ApiKeyModal";
 
 type ApiKey = {
     id: string;
@@ -21,6 +22,8 @@ const ApiKeysPage = () => {
     const [loading, setLoading] = useState(true);
     const [creating, setCreating] = useState(false);
     const [newKeyName, setNewKeyName] = useState("");
+    const [showModal, setShowModal] = useState(false);
+    const [newApiKey, setNewApiKey] = useState("");
 
     const fetchKeys = async () => {
         try {
@@ -66,6 +69,11 @@ const ApiKeysPage = () => {
 
             if (!response.ok) throw new Error("Failed to create key");
 
+            const { key } = await response.json();
+
+            setNewApiKey(key);
+            setShowModal(true);
+
             fetchKeys();
 
             // toast({
@@ -109,6 +117,15 @@ const ApiKeysPage = () => {
 
     return (
         <div className='p-6 max-w-4xl mx-auto space-y-6'>
+            {showModal && (
+                <ApiKeyModal
+                    apiKey={newApiKey}
+                    onClose={() => {
+                        setShowModal(false);
+                        setNewApiKey("");
+                    }}
+                />
+            )}
             <div className='flex items-center gap-2 mb-6'>
                 <KeyRound className='w-6 h-6' />
                 <h2 className='text-2xl font-semibold'>API Keys</h2>
@@ -152,9 +169,9 @@ const ApiKeysPage = () => {
                                 </div>
                             </div>
 
-                            <div className='flex items-center justify-between'>
+                            <div className='flex items-center justify-between w-full'>
                                 <code className='block p-2 bg-gray-100 rounded text-sm flex-1'>
-                                    {key.id}
+                                    sk-●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●●
                                 </code>
                                 <div className='ml-4'>
                                     {key.enabled ? (
