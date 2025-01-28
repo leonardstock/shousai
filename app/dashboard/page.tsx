@@ -9,6 +9,7 @@ import {
     CartesianGrid,
     Tooltip,
     Legend,
+    ResponsiveContainer,
 } from "recharts";
 import {
     Card,
@@ -17,180 +18,266 @@ import {
     CardContent,
 } from "@/components/shared/Card";
 import { Alert, AlertDescription } from "@/components/shared/Alert";
-import { DollarSign, TrendingDown, Zap } from "lucide-react";
-import { PromptOptimizer } from "@/lib/optimization/prompt";
+import { Brain, Building2, Calendar, DollarSign } from "lucide-react";
+import { subDays, subMonths, subYears, format } from "date-fns";
+import { UsageResponse } from "@/models/interfaces/usage";
 
-// Sample data - replace with real metrics from your optimization tests
-const data = [
-    { date: "2024-01-01", originalCost: 100, optimizedCost: 100 },
-    { date: "2024-01-02", originalCost: 120, optimizedCost: 95 },
-    { date: "2024-01-03", originalCost: 115, optimizedCost: 88 },
-    { date: "2024-01-04", originalCost: 130, optimizedCost: 92 },
-    { date: "2024-01-05", originalCost: 125, optimizedCost: 85 },
-];
+type RangeType = "day" | "week" | "month" | "year";
+type Provider = "all" | "openai" | "anthropic";
+
+async function fetchUsageData(
+    range: RangeType,
+    provider: Provider,
+    model: string
+) {
+    const now = new Date();
+    let startDate;
+
+    switch (range) {
+        case "day":
+            startDate = subDays(now, 1);
+            break;
+        case "week":
+            startDate = subDays(now, 7);
+            break;
+        case "month":
+            startDate = subMonths(now, 1);
+            break;
+        case "year":
+            startDate = subYears(now, 1);
+            break;
+        default:
+            startDate = subDays(now, 7);
+    }
+
+    const response = await fetch(
+        `/api/v1/usage?start=${startDate.toISOString()}&end=${now.toISOString()}&provider=${provider}&model=${model}`
+    );
+    return response.json();
+}
 
 const CostDashboard = () => {
-    const [isClient, setIsClient] = useState(false);
+    const [timeRange, setTimeRange] = useState<RangeType>("week");
+    const [usageData, setUsageData] = useState<UsageResponse>();
+    const [provider, setProvider] = useState<Provider>("all");
+    const [model, setModel] = useState<string>("all");
+    const [isLoading, setIsLoading] = useState<boolean>(true);
+    const [showTotalCostInGraph, setShowTotalCostInGraph] =
+        useState<boolean>(true);
+    const [showCacheSavingsInGraph, setShowCacheSavingsInGraph] =
+        useState<boolean>(true);
+    const [showActualCostInGraph, setShowActualCostInGraph] =
+        useState<boolean>(true);
 
     useEffect(() => {
-        setIsClient(true);
-    }, []);
-    // Calculate savings metrics
-    const totalOriginalCost = data.reduce(
-        (sum, day) => sum + day.originalCost,
-        0
-    );
-    const totalOptimizedCost = data.reduce(
-        (sum, day) => sum + day.optimizedCost,
-        0
-    );
-    const totalSaved = totalOriginalCost - totalOptimizedCost;
-    const savingsPercentage = ((totalSaved / totalOriginalCost) * 100).toFixed(
-        1
-    );
-
-    async function optimizationDemo() {
-        const samplePrompts = [
-            "Please can you tell me in detail about how to make a sandwich if possible thanks",
-            "I would like you to explain in order to help me understand the process of photosynthesis due to the fact that I am studying biology",
-            "At this point in time I need you to analyze this data",
-        ];
-
-        // Single prompt optimization
-        const result = PromptOptimizer.optimize(samplePrompts[2]);
-        console.log("Original prompt:", samplePrompts[2]);
-        console.log("Optimized prompt:", result.optimizedPrompt);
-        console.log("Tokens saved:", result.savings);
-        console.log("Optimizations applied:", result.optimizations);
-
-        // Analyze prompt history
-        const analysis = await PromptOptimizer.analyzePromptHistory(
-            samplePrompts
-        );
-        console.log("Total tokens saved:", analysis.totalSaved);
-        console.log("Average savings per prompt:", analysis.averageSavings);
-        console.log("Optimization success rate:", analysis.optimizationRate);
-        console.log("Recommendations:", analysis.recommendations);
-    }
+        async function loadData() {
+            setIsLoading(true);
+            const data = await fetchUsageData(timeRange, provider, model);
+            setUsageData(data);
+            setIsLoading(false);
+        }
+        loadData();
+    }, [timeRange, provider, model]);
 
     return (
         <div className='w-full max-w-6xl mx-auto p-4 space-y-6'>
-            {/* Summary Cards */}
+            <div className='flex justify-between items-center'>
+                <h2 className='text-2xl font-bold'>Usage Analytics</h2>
+                <div className='flex items-center gap-2'>
+                    <div className='flex items-center gap-2'>
+                        <Building2 className='h-4 w-4' />
+                        <select
+                            value={provider}
+                            onChange={(e) =>
+                                setProvider(e.target.value as Provider)
+                            }
+                            className='border rounded-md p-2'>
+                            <option value='all'>All</option>
+                            <option value='openai'>OpenAI</option>
+                            <option value='anthropic'>Anthropic</option>
+                        </select>
+                    </div>
+                    <div className='flex items-center gap-2'>
+                        <Brain className='h-4 w-4' />
+                        <select
+                            value={model}
+                            onChange={(e) => setModel(e.target.value as string)}
+                            className='border rounded-md p-2'>
+                            <option value='all'>All</option>
+                            <option value='gpt-3.5-turbo'>GPT 3.5</option>
+                            <option value='gpt-4'>GPT 4</option>
+                        </select>
+                    </div>
+                    <div className='flex items-center gap-2'>
+                        <Calendar className='h-4 w-4' />
+                        <select
+                            value={timeRange}
+                            onChange={(e) =>
+                                setTimeRange(e.target.value as RangeType)
+                            }
+                            className='border rounded-md p-2'>
+                            <option value='day'>Last 24h</option>
+                            <option value='week'>Last Week</option>
+                            <option value='month'>Last Month</option>
+                            <option value='year'>Last Year</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                 <Card>
-                    <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                        <CardTitle className='text-sm font-medium'>
-                            Total Cost Savings
-                        </CardTitle>
+                    <CardHeader className='flex flex-row items-center justify-between'>
+                        <CardTitle>Total Cost</CardTitle>
                         <DollarSign className='h-4 w-4 text-green-500' />
                     </CardHeader>
                     <CardContent>
                         <div className='text-2xl font-bold'>
-                            ${totalSaved.toFixed(2)}
+                            $
+                            {usageData?.analytics.summary.actual_cost.toFixed(
+                                5
+                            )}
                         </div>
-                        <p className='text-xs text-muted-foreground'>
-                            Over last 5 days
-                        </p>
                     </CardContent>
                 </Card>
 
                 <Card>
-                    <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                        <CardTitle className='text-sm font-medium'>
-                            Savings Percentage
-                        </CardTitle>
-                        <TrendingDown className='h-4 w-4 text-blue-500' />
+                    <CardHeader>
+                        <CardTitle>Cache Rate</CardTitle>
                     </CardHeader>
                     <CardContent>
                         <div className='text-2xl font-bold'>
-                            {savingsPercentage}%
+                            {
+                                usageData?.analytics.summary
+                                    .average_cache_hit_rate
+                            }
+                            %
                         </div>
-                        <p className='text-xs text-muted-foreground'>
-                            Average reduction
-                        </p>
                     </CardContent>
                 </Card>
 
                 <Card>
-                    <CardHeader className='flex flex-row items-center justify-between space-y-0 pb-2'>
-                        <CardTitle className='text-sm font-medium'>
-                            Optimizations Applied
-                        </CardTitle>
-                        <Zap className='h-4 w-4 text-yellow-500' />
+                    <CardHeader>
+                        <CardTitle>Total Savings</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className='text-2xl font-bold'>3</div>
-                        <p className='text-xs text-muted-foreground'>
-                            Active optimizations
-                        </p>
+                        <div className='text-2xl font-bold'>
+                            $
+                            {usageData?.analytics.summary.total_savings.toFixed(
+                                5
+                            )}
+                        </div>
                     </CardContent>
                 </Card>
             </div>
 
-            {/* Cost Trend Chart */}
             <Card>
                 <CardHeader>
-                    <CardTitle>Cost Trend Analysis</CardTitle>
+                    <CardTitle>Usage Trends</CardTitle>
                 </CardHeader>
                 <CardContent>
-                    <div className='h-[300px] w-full'>
-                        {isClient && (
-                            <LineChart
-                                width={800}
-                                height={300}
-                                data={data}
-                                margin={{
-                                    top: 5,
-                                    right: 30,
-                                    left: 20,
-                                    bottom: 5,
-                                }}>
+                    <div className='h-[400px] w-full'>
+                        <ResponsiveContainer>
+                            <LineChart data={usageData?.analytics.daily}>
                                 <CartesianGrid strokeDasharray='3 3' />
-                                <XAxis dataKey='date' />
+                                <XAxis
+                                    dataKey='date'
+                                    tickFormatter={(date) =>
+                                        format(new Date(date), "MMM dd")
+                                    }
+                                />
                                 <YAxis />
-                                <Tooltip />
-                                <Legend />
-                                <Line
-                                    type='monotone'
-                                    dataKey='originalCost'
-                                    stroke='#ff0000'
-                                    name='Original Cost'
+                                <Tooltip
+                                    labelFormatter={(date) =>
+                                        format(
+                                            new Date(date),
+                                            "MMM dd, yyyy HH:mm"
+                                        )
+                                    }
+                                    formatter={(value) => [
+                                        `$${(value as number).toFixed(5)}`,
+                                        undefined,
+                                    ]}
+                                />
+                                <Legend
+                                    onClick={(event) => {
+                                        switch (event.value) {
+                                            case "Original Cost":
+                                                setShowTotalCostInGraph(
+                                                    !showTotalCostInGraph
+                                                );
+                                                break;
+                                            case "Optimized Cost":
+                                                setShowActualCostInGraph(
+                                                    !showActualCostInGraph
+                                                );
+                                                break;
+                                            case "Savings":
+                                                setShowCacheSavingsInGraph(
+                                                    !showCacheSavingsInGraph
+                                                );
+                                                break;
+                                            default:
+                                                break;
+                                        }
+                                    }}
                                 />
                                 <Line
                                     type='monotone'
-                                    dataKey='optimizedCost'
-                                    stroke='#00ff00'
+                                    dataKey='metrics.total_cost'
+                                    name='Original Cost'
+                                    hide={!showTotalCostInGraph}
+                                    stroke='#ef4444'
+                                    strokeWidth={2}
+                                />
+                                <Line
+                                    type='monotone'
+                                    dataKey='metrics.actual_cost'
                                     name='Optimized Cost'
+                                    hide={!showActualCostInGraph}
+                                    stroke='green'
+                                    strokeWidth={2}
+                                />
+                                <Line
+                                    type='monotone'
+                                    dataKey='metrics.cached_cost'
+                                    hide={!showCacheSavingsInGraph}
+                                    name='Savings'
+                                    stroke='purple'
+                                    strokeWidth={2}
                                 />
                             </LineChart>
-                        )}
+                        </ResponsiveContainer>
                     </div>
                 </CardContent>
             </Card>
 
-            {/* Optimization Alerts */}
             <Alert>
                 <AlertDescription>
-                    <div className='flex flex-col space-y-2'>
-                        <div className='font-medium'>Active Optimizations:</div>
-                        <ul className='list-disc pl-4'>
-                            <li>
-                                Prompt length optimization reducing token usage
-                                by 15%
-                            </li>
-                            <li>
-                                Automatic model downgrading for simple tasks
-                                saving 25%
-                            </li>
-                            <li>
-                                Response caching preventing duplicate API calls
-                            </li>
-                        </ul>
+                    <div className='font-medium mb-2'>Usage Breakdown:</div>
+                    <div>
+                        Total Requests:{" "}
+                        {usageData?.analytics.summary.total_requests}
                     </div>
+                    <div>
+                        Cached Requests:{" "}
+                        {usageData?.analytics.summary.cached_requests}
+                    </div>
+                    {usageData?.logs && (
+                        <div>
+                            Success Rate:{" "}
+                            {(
+                                (usageData?.logs.filter((log) => log.success)
+                                    .length /
+                                    usageData?.analytics.summary
+                                        .total_requests) *
+                                100
+                            ).toFixed(1)}
+                            %
+                        </div>
+                    )}
                 </AlertDescription>
             </Alert>
-
-            <button onClick={optimizationDemo}>Run Optimization Demo</button>
         </div>
     );
 };

@@ -39,16 +39,15 @@ model EarlyAccess {
 }
 
 model ApiKey {
-  id         String     @id @default(cuid())
-  key        String     @unique
+  id         String    @id @default(cuid())
+  key        String    @unique
   name       String
-  userId     String     @unique
-  user       User       @relation(fields: [userId], references: [id])
-  createdAt  DateTime   @default(now())
-  lastUsed   DateTime   @default(now())
-  enabled    Boolean    @default(true)
+  userId     String    @unique
+  user       User      @relation(fields: [userId], references: [id])
+  createdAt  DateTime  @default(now())
+  lastUsed   DateTime  @default(now())
+  enabled    Boolean   @default(true)
   usageLimit Int?
-  usageLogs  UsageLog[]
   deletedAt  DateTime?
 
   @@index([key])
@@ -80,8 +79,6 @@ model User {
 model UsageLog {
   id           String   @id @default(cuid())
   createdAt    DateTime @default(now())
-  apiKeyId     String
-  apiKey       ApiKey   @relation(fields: [apiKeyId], references: [id], onDelete: Cascade)
   userId       String
   user         User     @relation(fields: [userId], references: [id])
   provider     String
@@ -92,6 +89,6 @@ model UsageLog {
   success      Boolean
   cached       Boolean
 
-  @@index([apiKeyId, createdAt])
+  @@index([userId, createdAt])
   @@index([createdAt])
 }
