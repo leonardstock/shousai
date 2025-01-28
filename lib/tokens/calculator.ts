@@ -97,7 +97,6 @@ export class TokenCalculator {
         tokenCount,
         success,
         cached,
-        apiKeyId,
     }: UsageLogParams): Promise<void> {
         try {
             await this.prisma.usageLog.create({
@@ -110,7 +109,6 @@ export class TokenCalculator {
                     cost: tokenCount.cost,
                     success,
                     cached,
-                    apiKeyId,
                 },
             });
         } catch (error) {
