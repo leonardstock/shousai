@@ -117,10 +117,9 @@ export async function POST(req: Request) {
                         provider,
                         inputTokens: cachedResult.tokenCount.inputTokens,
                         outputTokens: cachedResult.tokenCount.outputTokens,
-                        cost: 0,
+                        cost: cachedResult.tokenCount.cost,
                         success: true,
-                        cached: true, // Add this field to track cache hits
-                        apiKeyId: validKey.id,
+                        cached: true,
                     },
                 });
 
@@ -213,7 +212,6 @@ export async function POST(req: Request) {
                 cost: finalTokenCount.cost,
                 success: true,
                 cached: false,
-                apiKeyId: validKey.id,
             },
         });
 
@@ -227,24 +225,6 @@ export async function POST(req: Request) {
         });
     } catch (error) {
         console.error("Proxy error:", error);
-
-        // try {
-        //     await prisma.usageLog.create({
-        //         data: {
-        //             userId: userId!,
-        //             model: "unknown",
-        //             provider: "unknown",
-        //             inputTokens: 0,
-        //             outputTokens: 0,
-        //             cost: 0,
-        //             success: false,
-        //             cached: false,
-        //             apiKeyId: "",
-        //         },
-        //     });
-        // } catch (logError) {
-        //     console.error("Failed to log error:", logError);
-        // }
 
         return new NextResponse(
             error instanceof z.ZodError
