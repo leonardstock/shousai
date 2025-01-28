@@ -61,7 +61,7 @@ export default function LandingPage() {
                         </div> */}
                         <div>
                             <div className='text-3xl font-bold text-gray-900'>
-                                24hrs
+                                In minutes
                             </div>
                             <div className='text-gray-600'>Setup Time</div>
                         </div>
@@ -92,8 +92,10 @@ export default function LandingPage() {
                             Smart Optimization
                         </h3>
                         <p className='text-gray-600'>
-                            Automatic suggestions to reduce costs without
-                            affecting performance
+                            {/* Automatic suggestions to reduce costs without
+                        affecting performance */}
+                            Intelligent caching to reduce costs and time to
+                            answer without affecting quality
                         </p>
                     </div>
 
@@ -119,8 +121,7 @@ export default function LandingPage() {
                         Ready to optimize your AI costs?
                     </h2>
                     <p className='text-gray-600 mb-8'>
-                        Join the beta program and get the first month free when
-                        we launch.
+                        Join the beta program now!
                     </p>
                     <button
                         onClick={() =>

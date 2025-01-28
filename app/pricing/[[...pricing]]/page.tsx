@@ -33,6 +33,10 @@ export default function PricingPage() {
                         <ul className='text-gray-600 space-y-2 mb-6'>
                             <li className='flex items-center gap-2'>
                                 <CheckCircle className='w-5 h-5 text-green-500' />
+                                Up to 5 team members
+                            </li>
+                            <li className='flex items-center gap-2'>
+                                <CheckCircle className='w-5 h-5 text-green-500' />
                                 Up to 1000$ AI spend
                             </li>
                             <li className='flex items-center gap-2'>
@@ -69,6 +73,10 @@ export default function PricingPage() {
                         <ul className='text-gray-600 space-y-2 mb-6'>
                             <li className='flex items-center gap-2'>
                                 <CheckCircle className='w-5 h-5 text-green-500' />
+                                Up to 10 team members
+                            </li>
+                            <li className='flex items-center gap-2'>
+                                <CheckCircle className='w-5 h-5 text-green-500' />
                                 Up to 10,000$ AI spend
                             </li>
                             <li className='flex items-center gap-2'>
@@ -96,7 +104,7 @@ export default function PricingPage() {
                             Tailored solutions for large organizations.
                         </p>
                         <div className='text-4xl font-bold text-gray-900 mb-6'>
-                            £999+
+                            Custom
                             <span className='text-lg font-medium'>/month</span>
                         </div>
                         <ul className='text-gray-600 space-y-2 mb-6'>
@@ -122,7 +130,6 @@ export default function PricingPage() {
                 </div>
             </div>
 
-            {/* Footer */}
             <Footer />
         </div>
     );

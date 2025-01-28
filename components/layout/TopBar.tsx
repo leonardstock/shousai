@@ -2,6 +2,7 @@ import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import { auth } from "@clerk/nextjs/server";
 import Link from "next/link";
 import CustomUserButton from "./CustomUserButton";
+import NavLinks from "./NavLinks";
 
 const TopBar = async () => {
     const { userId } = await auth();
@@ -18,19 +19,13 @@ const TopBar = async () => {
                 </Link>
                 {userId && (
                     <div className='flex flex-row gap-4 text-white ms-10 '>
-                        <Link href='/dashboard' className='navLink'>
-                            Dashboard
-                        </Link>
-                        <Link href='/dashboard' className='navLink'>
-                            Optimization
-                        </Link>
-                        <Link href='/pricing' className='navLink'>
-                            Pricing
-                        </Link>
+                        <NavLinks />
                     </div>
                 )}
             </div>
             <div className='flex flex-row gap-4 text-white'>
+                {!userId && <Link href='/reference'>How to get started</Link>}
+                {!userId && <>&bull;</>}
                 {!userId && <Link href='/pricing'>Pricing</Link>}
                 <>
                     <SignedOut>

@@ -8,6 +8,7 @@ const isUnProtectedRoute = createRouteMatcher([
     "/terms(.*)",
     "/signin(.*)",
     "/signup(.*)",
+    "/reference(.*)",
     "/api/webhooks/(.*)",
     "/api/v1/proxy(.*)",
 ]);

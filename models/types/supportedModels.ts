@@ -29,4 +29,13 @@ export const MODEL_PRICING = {
     },
 } as const;
 
+export const HUMAN_READABLE_NAMES: { [key: string]: string } = {
+    "gpt-4-turbo-preview": "GPT-4 Turbo (Preview)",
+    "gpt-4": "GPT-4",
+    "gpt-3.5-turbo": "GPT-3.5 Turbo",
+    "gpt-3.5-turbo-instruct": "GPT-3.5 Turbo Instruct",
+    "claude-3-opus-20240229": "Claude 3 Opus",
+    "claude-3-sonnet-20240229": "Claude 3 Sonnet",
+};
+
 export type SupportedModel = keyof typeof MODEL_PRICING;
