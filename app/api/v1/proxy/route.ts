@@ -4,6 +4,7 @@ import { ApiKeyManager } from "@/lib/apiKeys/apiKeys";
 import { createRequestCache } from "@/lib/cache/requestCache";
 import { prisma } from "@/lib/db/prisma";
 import { TokenCalculator } from "@/lib/tokens/calculator";
+import { UsageManager } from "@/lib/usage/usageManager";
 import { CacheEntry } from "@/models/interfaces/cache";
 import {
     getModelProvider,
@@ -79,7 +80,7 @@ export async function POST(req: Request) {
         if (!userInfo) {
             return new NextResponse("User not found", { status: 401 });
         }
-        const userId = userInfo.userId;
+        const { userId, subscription } = userInfo;
 
         if (!validateModel(model)) {
             return new NextResponse(`Unsupported model: ${model}`, {
@@ -96,69 +97,78 @@ export async function POST(req: Request) {
 
         const cache = createRequestCache(process.env.UPSTASH_REDIS_REST_URL);
 
-        // Check cache with timeout
-        const cachedResult = await Promise.race<CacheEntry | null>([
-            cache.getCachedResponse(messages, model, provider),
-            new Promise((_, reject) =>
-                setTimeout(() => reject(new Error("Cache read timeout")), 2000)
-            ),
-        ]).catch((error) => {
-            console.error("Cache read error:", error);
-            return null;
-        });
-
-        if (cachedResult) {
-            try {
-                // Update cache stats with error handling
-                await Promise.race([
-                    cache.updateCacheStats(
-                        userId,
-                        true,
-                        cachedResult.tokenCount.cost
-                    ),
-                    new Promise((_, reject) =>
-                        setTimeout(
-                            () => reject(new Error("Stats update timeout")),
-                            1000
-                        )
-                    ),
-                ]).catch((error) => {
-                    console.error("Stats update error:", error);
-                });
-
-                // Log cached usage
-                await prisma.usageLog.create({
-                    data: {
-                        userId,
-                        model,
-                        provider,
-                        inputTokens: cachedResult.tokenCount.inputTokens,
-                        outputTokens: cachedResult.tokenCount.outputTokens,
-                        cost: cachedResult.tokenCount.cost,
-                        success: true,
-                        cached: true,
-                    },
-                });
-
-                return NextResponse.json({
-                    ...cachedResult.response,
-                    usage: {
-                        ...cachedResult.tokenCount,
-                        estimated_cost: "0.0000 (cached)",
-                        cached: true,
-                    },
-                });
-            } catch (error) {
-                console.error("Error processing cached result:", error);
-                // Fall through to API call if cache processing fails
-            }
-        }
-
         // Calculate estimated tokens
         const tokenCount = TokenCalculator.countTokens(
             messages,
             model as SupportedModel
         );
+
+        const { isUsageLimited, reason } = await UsageManager.checkUsageLimit(
+            userId
+        );
+
+        if (subscription?.tier !== "FREE" && !isUsageLimited) {
+            // Check cache with timeout
+            const cachedResult = await Promise.race<CacheEntry | null>([
+                cache.getCachedResponse(messages, model, provider),
+                new Promise((_, reject) =>
+                    setTimeout(
+                        () => reject(new Error("Cache read timeout")),
+                        2000
+                    )
+                ),
+            ]).catch((error) => {
+                console.error("Cache read error:", error);
+                return null;
+            });
+
+            if (cachedResult) {
+                try {
+                    // Update cache stats with error handling
+                    await Promise.race([
+                        cache.updateCacheStats(
+                            userId,
+                            true,
+                            cachedResult.tokenCount.cost
+                        ),
+                        new Promise((_, reject) =>
+                            setTimeout(
+                                () => reject(new Error("Stats update timeout")),
+                                1000
+                            )
+                        ),
+                    ]).catch((error) => {
+                        console.error("Stats update error:", error);
+                    });
+
+                    // Log cached usage
+                    await prisma.usageLog.create({
+                        data: {
+                            userId,
+                            model,
+                            provider,
+                            inputTokens: cachedResult.tokenCount.inputTokens,
+                            outputTokens: cachedResult.tokenCount.outputTokens,
+                            cost: cachedResult.tokenCount.cost,
+                            success: true,
+                            cached: true,
+                        },
+                    });
+
+                    return NextResponse.json({
+                        ...cachedResult.response,
+                        usage: {
+                            ...cachedResult.tokenCount,
+                            estimated_cost: "0.0000 (cached)",
+                            cached: true,
+                        },
+                    });
+                } catch (error) {
+                    console.error("Error processing cached result:", error);
+                    // Fall through to API call if cache processing fails
+                }
+            }
+        }
 
         // Make API call
         const providerConfig = PROVIDER_CONFIGS[provider];
@@ -189,56 +199,65 @@ export async function POST(req: Request) {
             model as SupportedModel
         );
 
-        // Cache the response with error handling
-        await Promise.race([
-            cache.cacheResponse(
-                messages,
-                model,
-                provider,
-                data,
-                finalTokenCount
-            ),
-            new Promise((_, reject) =>
-                setTimeout(() => reject(new Error("Cache write timeout")), 2000)
-            ),
-        ]).catch((error) => {
-            console.error("Cache write error:", error);
-        });
+        if (subscription?.tier !== "FREE" && !isUsageLimited) {
+            // Cache the response with error handling
+            await Promise.race([
+                cache.cacheResponse(
+                    messages,
+                    model,
+                    provider,
+                    data,
+                    finalTokenCount
+                ),
+                new Promise((_, reject) =>
+                    setTimeout(
+                        () => reject(new Error("Cache write timeout")),
+                        2000
+                    )
+                ),
+            ]).catch((error) => {
+                console.error("Cache write error:", error);
+            });
 
-        // Update cache stats
-        await Promise.race([
-            cache.updateCacheStats(userId, false),
-            new Promise((_, reject) =>
-                setTimeout(
-                    () => reject(new Error("Stats update timeout")),
-                    1000
-                )
-            ),
-        ]).catch((error) => {
-            console.error("Stats update error:", error);
-        });
+            // Update cache stats
+            await Promise.race([
+                cache.updateCacheStats(userId, false),
+                new Promise((_, reject) =>
+                    setTimeout(
+                        () => reject(new Error("Stats update timeout")),
+                        1000
+                    )
+                ),
+            ]).catch((error) => {
+                console.error("Stats update error:", error);
+            });
+        }
 
-        // Log usage
-        await prisma.usageLog.create({
-            data: {
-                userId,
-                model,
-                provider,
-                inputTokens: finalTokenCount.inputTokens,
-                outputTokens: finalTokenCount.outputTokens,
-                cost: finalTokenCount.cost,
-                success: true,
-                cached: false,
-            },
-        });
+        if (!isUsageLimited) {
+            // Log usage
+            await prisma.usageLog.create({
+                data: {
+                    userId,
+                    model,
+                    provider,
+                    inputTokens: finalTokenCount.inputTokens,
+                    outputTokens: finalTokenCount.outputTokens,
+                    cost: finalTokenCount.cost,
+                    success: true,
+                    cached: false,
+                },
+            });
+        }
+
+        if (isUsageLimited) {
+            return NextResponse.json({
+                ...data,
+                system_message: `shousai not active: ${reason}`,
+            });
+        }
 
         return NextResponse.json({
             ...data,
-            usage: {
-                ...finalTokenCount,
-                estimated_cost: finalTokenCount.cost.toFixed(4),
-                cached: false,
-            },
         });
     } catch (error) {
         console.error("Proxy error:", error);

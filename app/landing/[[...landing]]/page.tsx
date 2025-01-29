@@ -51,14 +51,14 @@ export default function LandingPage() {
                                 Average Monthly AI Spend
                             </div>
                         </div>
-                        {/* <div>
+                        <div>
                             <div className='text-3xl font-bold text-gray-900'>
-                                35%
+                                Varies depending on usage patterns
                             </div>
                             <div className='text-gray-600'>
                                 Average Cost Reduction
                             </div>
-                        </div> */}
+                        </div>
                         <div>
                             <div className='text-3xl font-bold text-gray-900'>
                                 In minutes

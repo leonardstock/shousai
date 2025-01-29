@@ -1,6 +1,7 @@
 "use server";
 
 import { prisma } from "@/lib/db/prisma";
+import { UsageManager } from "@/lib/usage/usageManager";
 import { createHash } from "crypto";
 
 export async function handleEarlyAccessSubmit(email: string) {
@@ -48,6 +49,8 @@ export async function upgradeUserSubscription(
                 stripeSubscriptionId,
                 status: "active",
                 startDate: new Date(),
+                monthlyUsageLimit: UsageManager.TIER_LIMITS.PRO.monthlyLimit,
+                dailyUsageLimit: UsageManager.TIER_LIMITS.PRO.dailyLimit,
             },
         });
     } catch (error) {
@@ -70,6 +73,8 @@ export async function downgradeUserSubscription(
                 stripeSubscriptionId,
                 status: "active",
                 startDate: new Date(),
+                monthlyUsageLimit: UsageManager.TIER_LIMITS.FREE.monthlyLimit,
+                dailyUsageLimit: UsageManager.TIER_LIMITS.FREE.dailyLimit,
             },
         });
     } catch (error) {
@@ -88,7 +93,11 @@ export async function getUserFromApiKey(apiKey: string) {
                 enabled: true,
             },
             include: {
-                user: true,
+                user: {
+                    include: {
+                        subscription: true,
+                    },
+                },
             },
         });
 
@@ -97,10 +106,42 @@ export async function getUserFromApiKey(apiKey: string) {
         return {
             userId: apiKeyRecord.userId,
             userDetails: apiKeyRecord.user,
+            subscription: apiKeyRecord.user.subscription,
         };
     } catch (error) {
         console.error("API Key Lookup Error:", error);
         return null;
+    }
+}
+
+export async function getUserUsageAndLimit(userId: string) {
+    try {
+        const subscription = await prisma.subscription.findUnique({
+            where: { userId },
+            select: {
+                dailyUsageLimit: true,
+                monthlyUsageLimit: true,
+            },
+        });
+
+        const { dailyUsage, monthlyUsage } = await UsageManager.getUserUsage(
+            userId
+        );
+
+        return {
+            dailyUsage: dailyUsage || 0,
+            monthlyUsage: monthlyUsage || 0,
+            dailyUsageLimit: subscription?.dailyUsageLimit || 0,
+            monthlyUsageLimit: subscription?.monthlyUsageLimit || 0,
+        };
+    } catch (error) {
+        console.error("Error fetching user usage and limit:", error);
+        return {
+            dailyUsageLimit: 0,
+            monthlyUsageLimit: 0,
+            dailyUsage: 0,
+            monthlyUsage: 0,
+        };
     }
 }
 

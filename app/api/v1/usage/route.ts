@@ -55,8 +55,6 @@ export async function GET(req: NextRequest) {
             ? Prisma.sql`DATE_TRUNC('hour', "createdAt")`
             : Prisma.sql`DATE_TRUNC('day', "createdAt")`;
 
-        console.log(groupByHours);
-
         // Get daily costs with cache status within date range
         const dailyCosts = await prisma.$queryRaw<DailyCostRow[]>`
             SELECT 

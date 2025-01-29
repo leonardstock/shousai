@@ -22,6 +22,7 @@ import { Brain, Building2, Calendar, DollarSign } from "lucide-react";
 import { subDays, subMonths, subYears, format } from "date-fns";
 import { UsageResponse } from "@/models/interfaces/usage";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import UsageIndicator from "@/components/shared/UsageIndicator";
 
 type RangeType = "day" | "week" | "month" | "year";
 type Provider = "all" | "openai" | "anthropic";
@@ -74,7 +75,6 @@ const CostDashboard = () => {
         async function loadData() {
             setIsLoading(true);
             const data = await fetchUsageData(timeRange, provider, model);
-            console.log(data);
             setUsageData(data);
             setIsLoading(false);
         }
@@ -263,6 +263,29 @@ const CostDashboard = () => {
                     </div>
                 </CardContent>
             </Card>
+
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Usage Breakdown Today</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className='flex flex-col gap-2'>
+                            <UsageIndicator type='daily' />
+                        </div>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Usage Breakdown This Month</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className='flex flex-col gap-2'>
+                            <UsageIndicator type='monthly' />
+                        </div>
+                    </CardContent>
+                </Card>
+            </div>
 
             <Alert>
                 <AlertDescription>

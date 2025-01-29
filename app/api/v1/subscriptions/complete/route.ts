@@ -9,6 +9,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
 const priceMapping: Record<SubscriptionTier, string> = {
     FREE: "price_1QkUeeF2dPz4IehQEx3dSV0C",
     PRO: "price_1QkUfwF2dPz4IehQOSu5b2Ol",
+    ENTERPRISE: "",
 };
 
 export async function POST(req: NextRequest) {

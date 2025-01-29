@@ -3,11 +3,7 @@ import { prisma } from "../db/prisma";
 
 export class ApiKeyManager {
     // Generate a new API key
-    static async createApiKey(
-        userId: string,
-        name: string,
-        usageLimit?: number
-    ) {
+    static async createApiKey(userId: string, name: string) {
         // Generate random key with prefix for easy identification
         const randomKey = `sk-${randomBytes(24).toString("hex")}`;
 
@@ -19,7 +15,6 @@ export class ApiKeyManager {
                 key: hashedKey,
                 name,
                 userId,
-                usageLimit,
             },
         });
 
@@ -42,26 +37,6 @@ export class ApiKeyManager {
         if (!apiKey || !apiKey.enabled) {
             return null;
         }
-
-        // Check usage limits if they exist
-        // if (apiKey.usageLimit) {
-        //     const startOfMonth = new Date();
-        //     startOfMonth.setDate(1);
-        //     startOfMonth.setHours(0, 0, 0, 0);
-
-        //     const monthlyUsage = await prisma.usageLog.count({
-        //         where: {
-        //             apiKeyId: apiKey.id,
-        //             createdAt: {
-        //                 gte: startOfMonth,
-        //             },
-        //         },
-        //     });
-
-        //     if (monthlyUsage >= apiKey.usageLimit) {
-        //         return null;
-        //     }
-        // }
 
         // Update last used timestamp
         await prisma.apiKey.update({

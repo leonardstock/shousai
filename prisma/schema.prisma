@@ -16,6 +16,7 @@ datasource db {
 enum SubscriptionTier {
   FREE
   PRO
+  ENTERPRISE
 }
 
 model Subscription {
@@ -28,6 +29,8 @@ model Subscription {
   startDate            DateTime         @default(now())
   endDate              DateTime?
   status               String           @default("active")
+  monthlyUsageLimit    Int?
+  dailyUsageLimit      Int?
 
   @@index([userId])
 }
@@ -39,16 +42,15 @@ model EarlyAccess {
 }
 
 model ApiKey {
-  id         String    @id @default(cuid())
-  key        String    @unique
-  name       String
-  userId     String    @unique
-  user       User      @relation(fields: [userId], references: [id])
-  createdAt  DateTime  @default(now())
-  lastUsed   DateTime  @default(now())
-  enabled    Boolean   @default(true)
-  usageLimit Int?
-  deletedAt  DateTime?
+  id        String    @id @default(cuid())
+  key       String    @unique
+  name      String
+  userId    String    @unique
+  user      User      @relation(fields: [userId], references: [id])
+  createdAt DateTime  @default(now())
+  lastUsed  DateTime  @default(now())
+  enabled   Boolean   @default(true)
+  deletedAt DateTime?
 
   @@index([key])
   @@index([userId])
