@@ -30,7 +30,6 @@ export async function GET() {
             createdAt: true,
             lastUsed: true,
             enabled: true,
-            usageLimit: true,
         },
     });
 
