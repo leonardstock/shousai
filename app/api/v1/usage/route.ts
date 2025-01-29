@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db/prisma";
 import { DailyStat, UsageResponse } from "@/models/interfaces/usage";
 import { auth } from "@clerk/nextjs/server";
 import { Prisma } from "@prisma/client";
+import { differenceInHours } from "date-fns";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(req: NextRequest) {
@@ -29,6 +30,11 @@ export async function GET(req: NextRequest) {
             return new NextResponse("Invalid date format", { status: 400 });
         }
 
+        const hoursDifference = differenceInHours(endDate, startDate);
+
+        // Determine grouping interval
+        const groupByHours = hoursDifference <= 24;
+
         type DailyCostRow = {
             date: Date;
             total_cost: string;
@@ -45,11 +51,16 @@ export async function GET(req: NextRequest) {
                 : Prisma.sql`AND "provider" = ${provider}`;
         const modelAddon =
             model === "all" ? Prisma.empty : Prisma.sql`AND "model" = ${model}`;
+        const groupByStatement = groupByHours
+            ? Prisma.sql`DATE_TRUNC('hour', "createdAt")`
+            : Prisma.sql`DATE_TRUNC('day', "createdAt")`;
+
+        console.log(groupByHours);
 
         // Get daily costs with cache status within date range
         const dailyCosts = await prisma.$queryRaw<DailyCostRow[]>`
             SELECT 
-                DATE_TRUNC('day', "createdAt") as date,
+                ${groupByStatement} as date,
                 COALESCE(SUM("cost"), 0) as total_cost,
                 COALESCE(SUM(CASE WHEN "cached" = true THEN "cost" ELSE 0 END), 0) as cached_cost,
                 COALESCE(SUM(CASE WHEN "cached" = false THEN "cost" ELSE 0 END), 0) as actual_cost,
@@ -63,13 +74,13 @@ export async function GET(req: NextRequest) {
                 AND "createdAt" <= ${endDate}
                 ${providerAddon}
                 ${modelAddon}
-            GROUP BY DATE_TRUNC('day', "createdAt")
+            GROUP BY ${groupByStatement}
             ORDER BY date ASC
         `;
 
         // Transform the raw data into a more friendly format
         const formattedStats: DailyStat[] = dailyCosts.map((day) => ({
-            date: day.date.toISOString().split("T")[0],
+            date: day.date.toISOString().split(".")[0] + "Z",
             metrics: {
                 total_cost: parseFloat(day.total_cost),
                 cached_cost: parseFloat(day.cached_cost),

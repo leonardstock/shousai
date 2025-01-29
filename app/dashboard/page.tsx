@@ -74,6 +74,7 @@ const CostDashboard = () => {
         async function loadData() {
             setIsLoading(true);
             const data = await fetchUsageData(timeRange, provider, model);
+            console.log(data);
             setUsageData(data);
             setIsLoading(false);
         }
@@ -187,7 +188,12 @@ const CostDashboard = () => {
                                 <XAxis
                                     dataKey='date'
                                     tickFormatter={(date) =>
-                                        format(new Date(date), "MMM dd")
+                                        format(
+                                            new Date(date),
+                                            timeRange === "day"
+                                                ? "HH:mm"
+                                                : "MMM dd"
+                                        )
                                     }
                                 />
                                 <YAxis />
@@ -195,7 +201,9 @@ const CostDashboard = () => {
                                     labelFormatter={(date) =>
                                         format(
                                             new Date(date),
-                                            "MMM dd, yyyy HH:mm"
+                                            timeRange === "day"
+                                                ? "MMM dd, yyyy HH:mm"
+                                                : "MMM dd, yyyy"
                                         )
                                     }
                                     formatter={(value) => [
