@@ -5,7 +5,11 @@ import { createRequestCache } from "@/lib/cache/requestCache";
 import { prisma } from "@/lib/db/prisma";
 import { TokenCalculator } from "@/lib/tokens/calculator";
 import { CacheEntry } from "@/models/interfaces/cache";
-import { SupportedModel } from "@/models/types/supportedModels";
+import {
+    getModelProvider,
+    SupportedModel,
+    validateModel,
+} from "@/models/types/supportedModels";
 import { NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -13,7 +17,6 @@ import { z } from "zod";
 const requestSchema = z.object({
     apiKey: z.string().min(1, "API key is required"),
     providerKey: z.string().min(1, "Provider API key is required"),
-    provider: z.enum(["openai", "anthropic"]),
     model: z.string().min(1, "Model is required"),
     messages: z
         .array(
@@ -59,8 +62,9 @@ const PROVIDER_CONFIGS = {
 
 export async function POST(req: Request) {
     try {
-        const { apiKey, providerKey, provider, model, messages } =
-            requestSchema.parse(await req.json());
+        const { apiKey, providerKey, model, messages } = requestSchema.parse(
+            await req.json()
+        );
 
         if (!process.env.UPSTASH_REDIS_REST_URL) {
             throw new Error("Cache configuration missing");
@@ -76,6 +80,19 @@ export async function POST(req: Request) {
             return new NextResponse("User not found", { status: 401 });
         }
         const userId = userInfo.userId;
+
+        if (!validateModel(model)) {
+            return new NextResponse(`Unsupported model: ${model}`, {
+                status: 500,
+            });
+        }
+
+        const provider = getModelProvider(model);
+        if (!provider) {
+            return new NextResponse(`Unsupported model: ${model}`, {
+                status: 500,
+            });
+        }
 
         const cache = createRequestCache(process.env.UPSTASH_REDIS_REST_URL);
 

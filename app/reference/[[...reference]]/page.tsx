@@ -18,9 +18,8 @@ const ApiDocumentation = () => {
         'Content-Type': 'application/json',
     },
     body: JSON.stringify({
-        apiKey: '<your-shousai-api-key>",',
-        providerKey: '<your-provider-api-key>',
-        provider: 'openai',
+        apiKey: 'your-shousai-api-key",',
+        providerKey: 'your-provider-api-key',
         model: 'gpt-4',
         messages: [
             {
@@ -34,9 +33,8 @@ const ApiDocumentation = () => {
 const data = await response.json();`;
 
     const axiosExample = `const response = await axios.post('https://shousai.co.uk/api/v1/proxy', {
-    apiKey: '<your-shousai-api-key>",',
-    providerKey: '<your-provider-api-key>',
-    provider: 'openai',
+    apiKey: 'your-shousai-api-key",',
+    providerKey: 'your-provider-api-key',
     model: 'gpt-4',
     messages: [
         {
@@ -52,9 +50,8 @@ def make_ai_request(prompt: str):
     url = "https://shousai.co.uk/api/v1/proxy"
     
     payload = {
-        "apiKey": "<your-shousai-api-key>",
-        "providerKey": "<your-provider-api-key>",
-        "provider": "openai",
+        "apiKey": "your-shousai-api-key",
+        "providerKey": "your-provider-api-key",
         "model": "gpt-4",
         "messages": [
             {
@@ -85,9 +82,8 @@ async def make_async_ai_request(prompt: str):
     url = "https://shousai.co.uk/api/v1/proxy"
     
     payload = {
-        "apiKey": "<your-shousai-api-key>",
-        "providerKey": "<your-provider-api-key>",
-        "provider": "anthropic",
+        "apiKey": "your-shousai-api-key",
+        "providerKey": "your-provider-api-key",
         "model": "claude-3-opus-20240229",
         "messages": [
             {
@@ -131,9 +127,8 @@ def make_ai_request_with_retry(prompt: str, max_retries: int = 3) -> Dict[str, A
     url = "https://shousai.co.uk/api/v1/proxy"
     
     payload = {
-        "apiKey": "<your-shousai-api-key>",
-        "providerKey": "<your-provider-api-key>",
-        "provider": "openai",
+        "apiKey": "your-shousai-api-key",
+        "providerKey": "your-provider-api-key",
         "model": "gpt-4",
         "messages": [
             {
@@ -268,10 +263,9 @@ except Exception as e:
                 <CodeBlock
                     code={JSON.stringify(
                         {
-                            apiKey: "<your-shousai-api-key>",
-                            providerKey: "<your-provider-api-key>",
-                            provider: "openai | anthropic",
-                            model: "<model-name>",
+                            apiKey: "your-shousai-api-key",
+                            providerKey: "your-provider-api-key",
+                            model: "model-name",
                             messages: [
                                 {
                                     role: "user | assistant",
@@ -297,7 +291,7 @@ except Exception as e:
                                 Model
                             </th>
                             <th className='border border-gray-300 px-4 py-2'>
-                                {"<model-name>"}
+                                {"model-name"}
                             </th>
                         </tr>
                     </thead>
