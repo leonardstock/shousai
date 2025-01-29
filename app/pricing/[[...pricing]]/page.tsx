@@ -37,7 +37,7 @@ export default function PricingPage() {
                             </li>
                             <li className='flex items-center gap-2'>
                                 <CheckCircle className='w-5 h-5 text-green-500' />
-                                Up to 1000$ AI spend
+                                Up to 500$ monthly AI spend
                             </li>
                             <li className='flex items-center gap-2'>
                                 <CheckCircle className='w-5 h-5 text-green-500' />
@@ -77,7 +77,7 @@ export default function PricingPage() {
                             </li>
                             <li className='flex items-center gap-2'>
                                 <CheckCircle className='w-5 h-5 text-green-500' />
-                                Up to 10,000$ AI spend
+                                Up to 10,000$ monthly AI spend
                             </li>
                             <li className='flex items-center gap-2'>
                                 <CheckCircle className='w-5 h-5 text-green-500' />
