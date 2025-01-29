@@ -21,7 +21,12 @@ body {
 
 .logo {
     font-size: 32px;
-    color: #ffffff;
+    color: rgb(40, 40, 40);
+}
+
+.landing-nav-link {
+    font-size: 16px;
+    color: rgb(40, 40, 40);
 }
 
 .border-gradient {

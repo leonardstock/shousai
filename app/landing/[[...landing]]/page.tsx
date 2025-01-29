@@ -12,7 +12,7 @@ export default function LandingPage() {
     return (
         <div className='min-h-screen bg-white'>
             {/* Hero Section */}
-            <div className='max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16'>
+            <div className='max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16'>
                 <div className='text-center'>
                     <h1 className='text-4xl sm:text-5xl font-bold text-gray-900 mb-6'>
                         Reduce Your AI Costs
@@ -38,7 +38,7 @@ export default function LandingPage() {
 
             {/* Social Proof */}
             <div className='bg-gray-50 py-12'>
-                <div className='max-w-6xl mx-auto px-4 sm:px-6 lg:px-8'>
+                <div className='max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8'>
                     <p className='text-center text-gray-600 mb-8'>
                         Companies using AI are spending thousands on API calls
                     </p>
@@ -70,7 +70,7 @@ export default function LandingPage() {
             </div>
 
             {/* Features */}
-            <div className='max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-20'>
+            <div className='max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-20'>
                 <div className='grid grid-cols-1 md:grid-cols-3 gap-12'>
                     <div className='text-center'>
                         <div className='w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mx-auto mb-4'>

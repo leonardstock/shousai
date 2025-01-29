@@ -6,7 +6,7 @@ export default function PricingPage() {
     return (
         <div className='flex flex-col min-h-screen bg-white'>
             {/* Header */}
-            <div className='max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 text-center'>
+            <div className='max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16 text-center'>
                 <h1 className='text-4xl sm:text-5xl font-bold text-gray-900 mb-6'>
                     Flexible Pricing for Every Team
                 </h1>
@@ -16,7 +16,7 @@ export default function PricingPage() {
             </div>
 
             {/* Pricing Cards */}
-            <div className='flex-grow max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-16'>
+            <div className='flex-grow max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 pb-16'>
                 <div className='grid grid-cols-1 md:grid-cols-3 gap-8'>
                     {/* Free Tier */}
                     <div className='border rounded-lg p-8 text-center bg-gray-50 shadow-md'>

@@ -13,14 +13,14 @@ const NavLinks = () => {
                 className={`navLink ${
                     currentRoute === "/dashboard" ? "active" : ""
                 }`}>
-                Dashboard
+                <div className='landing-nav-link'>Dashboard</div>
             </Link>
             <Link
                 href='/reference'
                 className={`navLink ${
                     currentRoute === "/reference" ? "active" : ""
                 }`}>
-                API Reference
+                <div className='landing-nav-link'>API Reference</div>
             </Link>
         </>
     );
