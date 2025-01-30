@@ -23,6 +23,7 @@ import { subDays, subMonths, subYears, format } from "date-fns";
 import { UsageResponse } from "@/models/interfaces/usage";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import UsageIndicator from "@/components/shared/UsageIndicator";
+// import SavingsCalculator from "@/components/shared/SavingsCalculator";
 
 type RangeType = "day" | "week" | "month" | "year";
 type Provider = "all" | "openai" | "anthropic";
@@ -83,12 +84,13 @@ const CostDashboard = () => {
 
     return (
         <div className='w-full max-w-screen-xl mx-auto p-4 space-y-6'>
-            <div className='flex justify-between items-center'>
-                <div className='flex items-center gap-5'>
+            {/* {usageData && <SavingsCalculator usageData={usageData} />} */}
+            <div className='flex flex-col md:flex-row justify-between md:items-center'>
+                <div className='flex items-center gap-5 lg:mb-0 mb-4'>
                     <h2 className='text-2xl font-bold'>Usage Analytics</h2>
                     {isLoading && <LoadingIndicator ballSize={10} />}
                 </div>
-                <div className='flex items-center gap-2'>
+                <div className='flex md:flex-row flex-col md:items-center gap-2'>
                     <div className='flex items-center gap-2'>
                         <Building2 className='h-4 w-4' />
                         <select
@@ -129,7 +131,6 @@ const CostDashboard = () => {
                     </div>
                 </div>
             </div>
-
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
                 <Card>
                     <CardHeader className='flex flex-row items-center justify-between'>
@@ -175,7 +176,6 @@ const CostDashboard = () => {
                     </CardContent>
                 </Card>
             </div>
-
             <Card>
                 <CardHeader>
                     <CardTitle>Usage Trends</CardTitle>
@@ -263,7 +263,6 @@ const CostDashboard = () => {
                     </div>
                 </CardContent>
             </Card>
-
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                 <Card>
                     <CardHeader>
@@ -286,7 +285,6 @@ const CostDashboard = () => {
                     </CardContent>
                 </Card>
             </div>
-
             <Alert>
                 <AlertDescription>
                     <div className='font-medium mb-2'>Usage Breakdown:</div>

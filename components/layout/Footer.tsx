@@ -2,10 +2,8 @@ import Link from "next/link";
 
 const Footer = () => {
     return (
-        <div
-            className='w-full p-6 lg:py-3'
-            style={{ backgroundColor: "rgb(40, 40, 40)" }}>
-            <div className='max-w-screen-xl mx-auto lg:flex flex-row justify-between items-center'>
+        <div className='w-full ' style={{ backgroundColor: "rgb(40, 40, 40)" }}>
+            <div className='max-w-screen-xl mx-auto lg:flex flex-row justify-between items-center p-6 lg:py-3'>
                 <div className='flex flex-row mb-2 lg:mb-0'>
                     <div style={{ color: "#ffffff" }}>
                         © 2025 Lower m Ltd. &bull; All rights reserved
