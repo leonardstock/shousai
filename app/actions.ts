@@ -4,21 +4,6 @@ import { prisma } from "@/lib/db/prisma";
 import { UsageManager } from "@/lib/usage/usageManager";
 import { createHash } from "crypto";
 
-export async function handleEarlyAccessSubmit(email: string) {
-    try {
-        await prisma.earlyAccess.create({
-            data: {
-                email: email,
-            },
-        });
-
-        return true;
-    } catch (error) {
-        console.error(error);
-        return false;
-    }
-}
-
 export async function getSubscriptionTier(userId: string) {
     try {
         const subscription = await prisma.subscription.findFirst({
@@ -114,25 +99,34 @@ export async function getUserFromApiKey(apiKey: string) {
     }
 }
 
-export async function getUserUsageAndLimit(userId: string) {
+export async function getOrganizationUsageAndLimit(userId: string) {
     try {
-        const subscription = await prisma.subscription.findUnique({
-            where: { userId },
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
             select: {
-                dailyUsageLimit: true,
-                monthlyUsageLimit: true,
+                organizationId: true,
+                subscription: { select: { tier: true } },
             },
         });
 
-        const { dailyUsage, monthlyUsage } = await UsageManager.getUserUsage(
-            userId
-        );
+        if (!user || !user.organizationId || !user.subscription) {
+            throw new Error("User, organization or subscription not found");
+        }
+
+        const { organizationId, subscription } = user;
+
+        const { dailyUsage, monthlyUsage } =
+            await UsageManager.getOrganizationUsage(organizationId);
+
+        const tierLimits = UsageManager.TIER_LIMITS[subscription.tier];
+        const dailyLimit = tierLimits.dailyLimit;
+        const monthlyLimit = tierLimits.monthlyLimit;
 
         return {
-            dailyUsage: dailyUsage || 0,
-            monthlyUsage: monthlyUsage || 0,
-            dailyUsageLimit: subscription?.dailyUsageLimit || 0,
-            monthlyUsageLimit: subscription?.monthlyUsageLimit || 0,
+            dailyUsage: dailyUsage,
+            monthlyUsage: monthlyUsage,
+            dailyUsageLimit: dailyLimit,
+            monthlyUsageLimit: monthlyLimit,
         };
     } catch (error) {
         console.error("Error fetching user usage and limit:", error);

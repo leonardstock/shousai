@@ -19,35 +19,26 @@ export class UsageManager {
     static async checkUsageLimit(
         userId: string
     ): Promise<{ isUsageLimited: boolean; reason: string }> {
-        const subscription = await prisma.subscription.findUnique({
-            where: { userId },
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
             select: {
-                tier: true,
-                monthlyUsageLimit: true,
-                dailyUsageLimit: true,
+                organizationId: true,
+                subscription: { select: { tier: true } },
             },
         });
 
-        if (!subscription) {
-            throw new Error("No subscription found");
+        if (!user || !user.organizationId || !user.subscription) {
+            throw new Error("User, organization or subscription not found");
         }
 
+        const { organizationId, subscription } = user;
         const tierLimits = this.TIER_LIMITS[subscription.tier];
-        const dailyLimit =
-            subscription.dailyUsageLimit || tierLimits.dailyLimit;
-        const monthlyLimit =
-            subscription.monthlyUsageLimit || tierLimits.monthlyLimit;
+        const dailyLimit = tierLimits.dailyLimit;
+        const monthlyLimit = tierLimits.monthlyLimit;
 
-        // Check daily usage
-        const startOfDay = new Date();
-        startOfDay.setHours(0, 0, 0, 0);
-
-        const dailyUsage = await prisma.usageLog.count({
-            where: {
-                userId,
-                createdAt: { gte: startOfDay },
-            },
-        });
+        const { dailyUsage, monthlyUsage } = await this.getOrganizationUsage(
+            organizationId
+        );
 
         if (dailyUsage >= dailyLimit) {
             return {
@@ -55,18 +46,6 @@ export class UsageManager {
                 reason: `Daily limit of ${dailyLimit} requests exceeded`,
             };
         }
-
-        // Check monthly usage
-        const startOfMonth = new Date();
-        startOfMonth.setDate(1);
-        startOfMonth.setHours(0, 0, 0, 0);
-
-        const monthlyUsage = await prisma.usageLog.count({
-            where: {
-                userId,
-                createdAt: { gte: startOfMonth },
-            },
-        });
 
         if (monthlyUsage >= monthlyLimit) {
             return {
@@ -105,5 +84,43 @@ export class UsageManager {
             dailyUsage,
             monthlyUsage,
         };
+    }
+
+    static async getOrganizationUsage(organizationId: string) {
+        const startOfDay = new Date();
+        startOfDay.setHours(0, 0, 0, 0);
+
+        const startOfMonth = new Date();
+        startOfMonth.setDate(1);
+        startOfMonth.setHours(0, 0, 0, 0);
+
+        // Get all user IDs in the organization
+        const users = await prisma.user.findMany({
+            where: { organizationId },
+            select: { id: true },
+        });
+
+        const userIds = users.map((user) => user.id);
+
+        if (userIds.length === 0) {
+            return { dailyUsage: 0, monthlyUsage: 0 };
+        }
+
+        const [dailyUsage, monthlyUsage] = await Promise.all([
+            prisma.usageLog.count({
+                where: {
+                    userId: { in: userIds },
+                    createdAt: { gte: startOfDay },
+                },
+            }),
+            prisma.usageLog.count({
+                where: {
+                    userId: { in: userIds },
+                    createdAt: { gte: startOfMonth },
+                },
+            }),
+        ]);
+
+        return { dailyUsage, monthlyUsage };
     }
 }

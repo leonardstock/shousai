@@ -45,6 +45,21 @@ export async function GET(req: NextRequest) {
             direct_requests: string;
         };
 
+        const organization = await prisma.user.findUnique({
+            where: { id: userId },
+            select: {
+                organizationId: true,
+            },
+        });
+
+        // Get all user IDs in the organization
+        const users = await prisma.user.findMany({
+            where: { organizationId: organization?.organizationId },
+            select: { id: true },
+        });
+
+        const userIds = users.map((user) => user.id).join(",");
+
         const providerAddon =
             provider === "all"
                 ? Prisma.empty
@@ -67,7 +82,7 @@ export async function GET(req: NextRequest) {
                 COUNT(CASE WHEN "cached" = false THEN 1 END) as direct_requests
             FROM "UsageLog"
             WHERE 
-                "userId" = ${userId}
+                "userId" IN (${userIds})
                 AND "createdAt" >= ${startDate}
                 AND "createdAt" <= ${endDate}
                 ${providerAddon}

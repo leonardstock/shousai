@@ -1,6 +1,6 @@
 "use client";
 
-import { getUserUsageAndLimit } from "@/app/actions";
+import { getOrganizationUsageAndLimit } from "@/app/actions";
 import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 
@@ -22,7 +22,7 @@ const UsageIndicator = ({ type }: UsageIndicatorProps) => {
                 monthlyUsageLimit,
                 dailyUsage,
                 monthlyUsage,
-            } = await getUserUsageAndLimit(userId);
+            } = await getOrganizationUsageAndLimit(userId);
 
             if (type === "daily") {
                 setLimit(dailyUsageLimit);
