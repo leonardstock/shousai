@@ -2,6 +2,7 @@ import { Webhook } from "svix";
 import { headers } from "next/headers";
 import { WebhookEvent } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/db/prisma";
+import { sendWelcomeEmail } from "@/lib/emails/emailUtils";
 
 export async function POST(req: Request) {
     // Get the webhook signing secret from your environment variables
@@ -56,7 +57,7 @@ export async function POST(req: Request) {
         const primaryEmail = email_addresses[0]?.email_address;
 
         try {
-            await prisma.user.create({
+            const user = await prisma.user.create({
                 data: {
                     id: id,
                     firstName: first_name!,
@@ -70,6 +71,8 @@ export async function POST(req: Request) {
                     },
                 },
             });
+
+            await sendWelcomeEmail(user);
 
             return new Response("User created", { status: 200 });
         } catch (err) {

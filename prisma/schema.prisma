@@ -35,12 +35,6 @@ model Subscription {
   @@index([userId])
 }
 
-model EarlyAccess {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  createdAt DateTime @default(now())
-}
-
 model ApiKey {
   id        String    @id @default(cuid())
   key       String    @unique
