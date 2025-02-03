@@ -283,7 +283,11 @@ except Exception as e:
                     The noCache parameter is optional and defaults to false. If
                     set to true, the response will not be cached. Please use
                     this flag if you are experiencing issues with caching or if
-                    you want to bypass the cache.
+                    you want to bypass the cache. This could be the case if your
+                    prompt includes phrases like: &quot;What happened
+                    yesterday?&quot; where the question is the same but the
+                    response will obviously differ from day to day. We do not
+                    take responsibility for any misuse of this feature.
                 </p>
             </section>
 
