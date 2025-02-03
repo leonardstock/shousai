@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { getUserFromApiKey } from "@/app/actions";
+import { getUserFromApiKey, handleCheckCustomSpendLimit } from "@/app/actions";
 import { ApiKeyManager } from "@/lib/apiKeys/apiKeys";
 import { createRequestCache } from "@/lib/cache/requestCache";
 import { prisma } from "@/lib/db/prisma";
@@ -19,6 +19,7 @@ const requestSchema = z.object({
     apiKey: z.string().min(1, "API key is required"),
     providerKey: z.string().min(1, "Provider API key is required"),
     model: z.string().min(1, "Model is required"),
+    noCache: z.boolean().optional(),
     messages: z
         .array(
             z.object({
@@ -63,9 +64,8 @@ const PROVIDER_CONFIGS = {
 
 export async function POST(req: Request) {
     try {
-        const { apiKey, providerKey, model, messages } = requestSchema.parse(
-            await req.json()
-        );
+        const { apiKey, providerKey, model, messages, noCache } =
+            requestSchema.parse(await req.json());
 
         if (!process.env.UPSTASH_REDIS_REST_URL) {
             throw new Error("Cache configuration missing");
@@ -80,7 +80,7 @@ export async function POST(req: Request) {
         if (!userInfo) {
             return new NextResponse("User not found", { status: 401 });
         }
-        const { userId, subscription } = userInfo;
+        const { userId } = userInfo;
 
         if (!validateModel(model)) {
             return new NextResponse(`Unsupported model: ${model}`, {
@@ -103,11 +103,10 @@ export async function POST(req: Request) {
             model as SupportedModel
         );
 
-        const { isUsageLimited, reason } = await UsageManager.checkUsageLimit(
-            userId
-        );
+        const { isUsageLimited, reason } =
+            await UsageManager.checkUsageLimit(userId);
 
-        if (subscription?.tier !== "FREE" && !isUsageLimited) {
+        if (!noCache && !isUsageLimited) {
             // Check cache with timeout
             const cachedResult = await Promise.race<CacheEntry | null>([
                 cache.getCachedResponse(messages, model, provider),
@@ -199,7 +198,7 @@ export async function POST(req: Request) {
             model as SupportedModel
         );
 
-        if (subscription?.tier !== "FREE" && !isUsageLimited) {
+        if (!noCache && !isUsageLimited) {
             // Cache the response with error handling
             await Promise.race([
                 cache.cacheResponse(
@@ -247,17 +246,17 @@ export async function POST(req: Request) {
                     cached: false,
                 },
             });
-        }
 
-        if (isUsageLimited) {
+            await handleCheckCustomSpendLimit(userId);
+
             return NextResponse.json({
                 ...data,
-                system_message: `shousai not active: ${reason}`,
             });
         }
 
         return NextResponse.json({
             ...data,
+            system_message: `shousai not active: ${reason}`,
         });
     } catch (error) {
         console.error("Proxy error:", error);
