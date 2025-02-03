@@ -1,3 +1,7 @@
+import {
+    getOrganizationAndMembersFromUserId,
+    handleApiUsageLimitReachedEmail,
+} from "@/app/actions";
 import { prisma } from "../db/prisma";
 
 export class UsageManager {
@@ -27,7 +31,15 @@ export class UsageManager {
             },
         });
 
-        if (!user || !user.organizationId || !user.subscription) {
+        const { organization } =
+            await getOrganizationAndMembersFromUserId(userId);
+
+        if (
+            !user ||
+            !user.organizationId ||
+            !user.subscription ||
+            !organization
+        ) {
             throw new Error("User, organization or subscription not found");
         }
 
@@ -36,22 +48,55 @@ export class UsageManager {
         const dailyLimit = tierLimits.dailyLimit;
         const monthlyLimit = tierLimits.monthlyLimit;
 
-        const { dailyUsage, monthlyUsage } = await this.getOrganizationUsage(
-            organizationId
-        );
+        const { dailyUsage, monthlyUsage } =
+            await this.getOrganizationUsage(organizationId);
 
         if (dailyUsage >= dailyLimit) {
+            if (!organization.dailyApiCallLimitEmailSent) {
+                handleApiUsageLimitReachedEmail({
+                    userId,
+                    tier: subscription.tier,
+                    daily: true,
+                });
+            }
+
             return {
                 isUsageLimited: true,
                 reason: `Daily limit of ${dailyLimit} requests exceeded`,
             };
         }
 
+        if (organization.dailyApiCallLimitEmailSent) {
+            await prisma.organization.update({
+                where: { id: organization?.id },
+                data: {
+                    dailyApiCallLimitEmailSent: false,
+                },
+            });
+        }
+
         if (monthlyUsage >= monthlyLimit) {
+            if (!organization.monthlyApiCallLimitEmailSent) {
+                handleApiUsageLimitReachedEmail({
+                    userId,
+                    tier: subscription.tier,
+                    daily: false,
+                });
+            }
+
             return {
                 isUsageLimited: true,
                 reason: `Monthly limit of ${monthlyLimit} requests exceeded`,
             };
+        }
+
+        if (organization.monthlyApiCallLimitEmailSent) {
+            await prisma.organization.update({
+                where: { id: organization?.id },
+                data: {
+                    monthlyApiCallLimitEmailSent: false,
+                },
+            });
         }
 
         return { isUsageLimited: false, reason: "" };

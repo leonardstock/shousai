@@ -58,7 +58,7 @@ export async function GET(req: NextRequest) {
             select: { id: true },
         });
 
-        const userIds = users.map((user) => user.id).join(",");
+        const userIds = users.map((user) => user.id);
 
         const providerAddon =
             provider === "all"
@@ -82,7 +82,7 @@ export async function GET(req: NextRequest) {
                 COUNT(CASE WHEN "cached" = false THEN 1 END) as direct_requests
             FROM "UsageLog"
             WHERE 
-                "userId" IN (${userIds})
+                "userId" = ANY(${userIds}::text[])
                 AND "createdAt" >= ${startDate}
                 AND "createdAt" <= ${endDate}
                 ${providerAddon}

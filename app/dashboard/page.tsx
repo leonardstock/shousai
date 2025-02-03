@@ -23,6 +23,8 @@ import { subDays, subMonths, subYears, format } from "date-fns";
 import { UsageResponse } from "@/models/interfaces/usage";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import UsageIndicator from "@/components/shared/UsageIndicator";
+import NoOrgHint from "@/components/setup/NoOrgHint";
+import { useOrganization } from "@clerk/nextjs";
 // import SavingsCalculator from "@/components/shared/SavingsCalculator";
 
 type RangeType = "day" | "week" | "month" | "year";
@@ -60,6 +62,7 @@ async function fetchUsageData(
 }
 
 const CostDashboard = () => {
+    const { organization } = useOrganization();
     const [timeRange, setTimeRange] = useState<RangeType>("week");
     const [usageData, setUsageData] = useState<UsageResponse>();
     const [provider, setProvider] = useState<Provider>("all");
@@ -84,6 +87,7 @@ const CostDashboard = () => {
 
     return (
         <div className='w-full max-w-screen-xl mx-auto p-4 space-y-6'>
+            {!organization && <NoOrgHint />}
             {/* {usageData && <SavingsCalculator usageData={usageData} />} */}
             <div className='flex flex-col md:flex-row justify-between md:items-center'>
                 <div className='flex items-center gap-5 lg:mb-0 mb-4'>

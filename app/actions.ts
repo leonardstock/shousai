@@ -1,7 +1,14 @@
 "use server";
 
+import {
+    ApiCallLimitReachedEmail,
+    CustomSpendLimitReachedEmail,
+} from "@/components/email/Templates";
 import { prisma } from "@/lib/db/prisma";
+import { sendEmail } from "@/lib/emails/emailUtils";
 import { UsageManager } from "@/lib/usage/usageManager";
+import { clerkClient } from "@clerk/nextjs/server";
+import { Subscription } from "@prisma/client";
 import { createHash } from "crypto";
 
 export async function getSubscriptionTier(userId: string) {
@@ -138,6 +145,202 @@ export async function getOrganizationUsageAndLimit(userId: string) {
         };
     }
 }
+
+export async function getOrganizationAndMembersFromUserId(userId: string) {
+    try {
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
+            include: {
+                organization: true,
+            },
+        });
+
+        if (!user || !user.organization) {
+            throw new Error("User or organization not found");
+        }
+
+        const members = await prisma.user.findMany({
+            where: {
+                organizationId: user.organizationId,
+            },
+        });
+
+        const { organization } = user;
+
+        return {
+            organization,
+            members,
+        };
+    } catch (error) {
+        console.error("Error fetching organization and members:", error);
+        return {
+            organization: null,
+            members: [],
+        };
+    }
+}
+
+export const removeMemberFromOrganization = async (
+    userId: string,
+    orgId: string
+) => {
+    try {
+        const client = await clerkClient();
+        await client.organizations.deleteOrganizationMembership({
+            organizationId: orgId,
+            userId: userId,
+        });
+    } catch (error) {
+        console.error("Error removing member from organization:", error);
+    }
+};
+
+export const updateOrganizationName = async (orgId: string, name: string) => {
+    try {
+        const client = await clerkClient();
+        await client.organizations.updateOrganization(orgId, {
+            name: name,
+        });
+    } catch (error) {
+        console.error("Error updating organization name:", error);
+    }
+};
+
+export const updateOrganizationSpendLimit = async (
+    orgId: string,
+    spendLimit: number
+) => {
+    try {
+        await prisma.organization.update({
+            where: { id: orgId },
+            data: {
+                spendLimit: spendLimit,
+            },
+        });
+    } catch (error) {
+        console.error("Error updating organization spend limit:", error);
+    }
+};
+
+export const deleteOrganization = async (orgId: string) => {
+    try {
+        const client = await clerkClient();
+        await client.organizations.deleteOrganization(orgId);
+    } catch (error) {
+        console.error("Error deleting organization:", error);
+    }
+};
+
+export const handleCheckCustomSpendLimit = async (userId: string) => {
+    try {
+        const { organization, members } =
+            await getOrganizationAndMembersFromUserId(userId);
+
+        if (organization) {
+            const customSpendLimit = organization.spendLimit || Infinity;
+            const allSpend = await getAllOrganizationSpend(organization.id);
+
+            if (
+                customSpendLimit !== Infinity &&
+                allSpend >= customSpendLimit &&
+                organization.spendLimitEmailSent === false
+            ) {
+                sendEmail({
+                    to: members.map((member) => member.email),
+                    subject: "Custom Spend Limit Reached",
+                    body: CustomSpendLimitReachedEmail({
+                        organization,
+                        customSpendLimit,
+                    }),
+                });
+
+                await prisma.organization.update({
+                    where: { id: organization?.id },
+                    data: {
+                        spendLimitEmailSent: true,
+                    },
+                });
+            }
+        }
+        return true;
+    } catch (error) {
+        console.error("Error checking custom spend limit:", error);
+        return false;
+    }
+};
+
+export const getAllOrganizationSpend = async (orgId: string) => {
+    try {
+        const { members } = await getOrganizationAndMembersFromUserId(orgId);
+
+        const result = await prisma.usageLog.aggregate({
+            _sum: {
+                cost: true,
+            },
+            where: {
+                userId: { in: members.map((member) => member.id) },
+            },
+        });
+
+        return result._sum.cost ?? 0;
+    } catch (error) {
+        console.error("Error getting all organization spend:", error);
+        return -1;
+    }
+};
+
+export const handleApiUsageLimitReachedEmail = async ({
+    userId,
+    tier,
+    daily,
+}: {
+    userId: string;
+    tier: Subscription["tier"];
+    daily: boolean;
+}) => {
+    try {
+        const { organization, members } =
+            await getOrganizationAndMembersFromUserId(userId);
+
+        if (!organization) {
+            return;
+        }
+
+        const tierLimits = UsageManager.TIER_LIMITS[tier];
+        const dailyLimit = tierLimits.dailyLimit;
+        const monthlyLimit = tierLimits.monthlyLimit;
+
+        await sendEmail({
+            to: members.map((member) => member.email),
+            subject: daily
+                ? "Daily API Call Limit Reached"
+                : "Monthly API Call Limit Reached",
+            body: ApiCallLimitReachedEmail({
+                organization,
+                apiCallLimit: daily ? dailyLimit : monthlyLimit,
+                daily,
+            }),
+        });
+
+        if (daily) {
+            await prisma.organization.update({
+                where: { id: organization?.id },
+                data: {
+                    dailyApiCallLimitEmailSent: true,
+                },
+            });
+        } else {
+            await prisma.organization.update({
+                where: { id: organization?.id },
+                data: {
+                    monthlyApiCallLimitEmailSent: true,
+                },
+            });
+        }
+    } catch (error) {
+        console.error("Error sending API call limit reached email:", error);
+    }
+};
 
 function hashApiKey(key: string) {
     return createHash("sha256").update(key).digest("hex");

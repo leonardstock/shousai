@@ -1,4 +1,4 @@
-import { User } from "@prisma/client";
+import { Organization, User } from "@prisma/client";
 import React from "react";
 import { Tailwind, Button } from "@react-email/components";
 
@@ -129,7 +129,6 @@ export const OrganizationCreatedEmail = ({ user }: { user: User }) => {
                 <ul className='text-gray-600 space-y-3'>
                     <li>• Invite team members</li>
                     <li>• Set up billing preferences</li>
-                    <li>• Configure monitoring settings</li>
                     <li>• Create budget alerts</li>
                 </ul>
             </div>
@@ -137,45 +136,63 @@ export const OrganizationCreatedEmail = ({ user }: { user: User }) => {
     );
 };
 
-export const OrganizationInviteEmail = ({
-    user,
-    invitedBy,
-    orgName,
+export const CustomSpendLimitReachedEmail = ({
+    organization,
+    customSpendLimit,
 }: {
-    user: User;
-    invitedBy: User;
-    orgName: string;
+    organization: Organization;
+    customSpendLimit: number;
 }) => {
-    const inviteeDisplayName = user.firstName || user.email.split("@")[0];
-    const inviterDisplayName = invitedBy.firstName
-        ? `${invitedBy.firstName} ${invitedBy.lastName}`.trim()
-        : invitedBy.email;
-
     return (
         <EmailTemplate>
             <h1 className='text-2xl font-bold text-gray-900 mb-6'>
-                Hi {inviteeDisplayName}, Join {orgName} on Our Platform
+                Hi there, Your Custom Spend Limit Has Been Reached
             </h1>
             <p className='text-xl text-gray-600 mb-8'>
-                {inviterDisplayName} has invited you to join their organization
-                to help manage and optimize AI costs.
+                Your spend limit of ${customSpendLimit} for {organization.name}{" "}
+                has been reached. You can manage your spend limit in your
+                organization settings.
             </p>
             <div className='mb-8'>
-                <CustomButton
-                    href={`https://yourplatform.com/accept-invite?uid=${user.id}&org=${invitedBy.organizationId}`}>
-                    Accept Invitation
+                <CustomButton href={`https://shousai.co.uk/dashboard`}>
+                    Manage Spend Limit
                 </CustomButton>
             </div>
-            <div className='bg-gray-50 p-6 rounded-lg mb-8'>
-                <h3 className='text-lg font-semibold text-gray-900 mb-4'>
-                    What you&apos;ll get:
-                </h3>
-                <ul className='text-gray-600 space-y-3'>
-                    <li>• Real-time cost monitoring</li>
-                    <li>• Smart optimization suggestions</li>
-                    <li>• Budget controls and alerts</li>
-                    <li>• Collaboration with your team</li>
-                </ul>
+        </EmailTemplate>
+    );
+};
+
+export const ApiCallLimitReachedEmail = ({
+    organization,
+    apiCallLimit,
+    daily,
+}: {
+    organization: Organization;
+    apiCallLimit: number;
+    daily: boolean;
+}) => {
+    return (
+        <EmailTemplate>
+            <h1 className='text-2xl font-bold text-gray-900 mb-6'>
+                Hi there, Your API Call Limit Has Been Reached
+            </h1>
+            <p className='text-xl text-gray-600 mb-8'>
+                Your API call limit of {apiCallLimit} for {organization.name}{" "}
+                for {daily ? "today" : "this month"} has been reached. To get
+                more calls consider upgrading your plan.
+            </p>
+
+            <p className='text-xl text-gray-600 mb-8'>
+                Note: This only applies to the service shousai provides. Your
+                API calls to OpenAI and Anthropic models are still going
+                through, but will not be included in your dashboard overview or
+                optimised.
+            </p>
+
+            <div className='mb-8'>
+                <CustomButton href={`https://shousai.co.uk/dashboard`}>
+                    See your plan
+                </CustomButton>
             </div>
         </EmailTemplate>
     );
