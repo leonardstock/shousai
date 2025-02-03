@@ -265,6 +265,7 @@ except Exception as e:
                         {
                             apiKey: "your-shousai-api-key",
                             providerKey: "your-provider-api-key",
+                            noCache: "true | false (optional, default: false)",
                             model: "model-name",
                             messages: [
                                 {
@@ -278,6 +279,12 @@ except Exception as e:
                     )}
                     language='JSON'
                 />
+                <p className='text-gray-600 mb-4'>
+                    The noCache parameter is optional and defaults to false. If
+                    set to true, the response will not be cached. Please use
+                    this flag if you are experiencing issues with caching or if
+                    you want to bypass the cache.
+                </p>
             </section>
 
             <section className='mb-12'>

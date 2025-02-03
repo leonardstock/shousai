@@ -150,7 +150,7 @@ export default function PricingPage() {
                             <tbody>
                                 <tr className='border-t border-gray-200'>
                                     <td className='py-4 px-6 text-left'>
-                                        Daily API Calls
+                                        Daily API Calls*
                                     </td>
                                     <td className='py-4 px-6 text-center'>
                                         50
@@ -164,7 +164,7 @@ export default function PricingPage() {
                                 </tr>
                                 <tr className='border-t border-gray-200'>
                                     <td className='py-4 px-6 text-left'>
-                                        Monthly API Calls
+                                        Monthly API Calls*
                                     </td>
                                     <td className='py-4 px-6 text-center'>
                                         500
@@ -191,6 +191,17 @@ export default function PricingPage() {
                             </tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+
+            <div>
+                <div className='max-w-screen-xl mx-auto mb-10 px-4 sm:px-6 lg:px-8'>
+                    <p className='border rounded-lg p-4 text-bold shadow-md'>
+                        *Note: The limitations in API calls only apply to the
+                        service shousai provides. Your API calls to OpenAI and
+                        Anthropic models are still going through, but will not
+                        be included in your dashboard overview or optimised.
+                    </p>
                 </div>
             </div>
 
