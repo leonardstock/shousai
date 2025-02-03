@@ -35,3 +35,26 @@ export async function GET() {
 
     return NextResponse.json(keys);
 }
+
+export async function DELETE(req: Request) {
+    const { userId } = await auth();
+    if (!userId) {
+        return new NextResponse("Unauthorized", { status: 401 });
+    }
+
+    const { keyId } = await req.json();
+
+    const apiKey = await prisma.apiKey.findUnique({
+        where: { id: keyId, userId: userId },
+    });
+
+    if (!apiKey) {
+        return new NextResponse("Invalid API key", { status: 401 });
+    }
+
+    await prisma.apiKey.delete({
+        where: { id: keyId },
+    });
+
+    return NextResponse.json({ message: "API key deleted" });
+}
