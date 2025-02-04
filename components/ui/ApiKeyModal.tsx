@@ -1,4 +1,6 @@
-import React from "react";
+"use client";
+
+import { useState } from "react";
 import { Copy, X } from "lucide-react";
 import { Button } from "../shared/Button";
 
@@ -9,8 +11,14 @@ export const ApiKeyModal = ({
     apiKey: string;
     onClose: () => void;
 }) => {
+    const [copied, setCopied] = useState(false);
+
     const copyKey = async () => {
         await navigator.clipboard.writeText(apiKey);
+        setCopied(true);
+        setTimeout(() => {
+            setCopied(false);
+        }, 2000);
     };
 
     return (
@@ -40,7 +48,7 @@ export const ApiKeyModal = ({
                 <div className='flex justify-end gap-3'>
                     <Button onClick={copyKey} variant='outline'>
                         <Copy className='w-4 h-4 mr-2' />
-                        Copy
+                        {copied ? "Copied!" : "Copy Key"}
                     </Button>
                     <Button onClick={onClose}>Done</Button>
                 </div>

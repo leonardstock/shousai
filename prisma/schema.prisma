@@ -29,8 +29,6 @@ model Subscription {
   startDate            DateTime         @default(now())
   endDate              DateTime?
   status               String           @default("active")
-  monthlyUsageLimit    Int?
-  dailyUsageLimit      Int?
 
   @@index([userId])
 }

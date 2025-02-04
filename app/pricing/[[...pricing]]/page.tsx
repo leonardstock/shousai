@@ -40,7 +40,7 @@ export default function PricingPage() {
                             </li>
                             <li className='flex items-center gap-2'>
                                 <CheckCircle className='w-5 h-5 text-green-500' />
-                                Basic cost tracking
+                                Basic cost tracking & Optimization
                             </li>
                             <li className='flex items-center gap-2'>
                                 <CheckCircle className='w-5 h-5 text-green-500' />
@@ -72,7 +72,7 @@ export default function PricingPage() {
                         <ul className='text-gray-600 space-y-2 mb-6'>
                             <li className='flex items-center gap-2'>
                                 <CheckCircle className='w-5 h-5 text-green-500' />
-                                Up to 10 team members
+                                Up to 5 team members
                             </li>
                             <li className='flex items-center gap-2'>
                                 <CheckCircle className='w-5 h-5 text-green-500' />
@@ -182,7 +182,7 @@ export default function PricingPage() {
                                     </td>
                                     <td className='py-4 px-6 text-center'>1</td>
                                     <td className='py-4 px-6 text-center border-x-2 border-b-2 border-blue-600'>
-                                        10
+                                        5
                                     </td>
                                     <td className='py-4 px-6 text-center'>
                                         Custom

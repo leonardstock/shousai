@@ -1,12 +1,13 @@
 import { useOrganization, useOrganizationList, useUser } from "@clerk/nextjs";
 import { Button } from "../../shared/Button";
-import { Check, Pen, Plus, Trash } from "lucide-react";
+import { Check, DollarSign, Pen, Plus, Trash } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Input } from "../../shared/Input";
 import { OrganizationMembersList } from "./OrganizationMembersList";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import {
     deleteOrganization,
+    getOrganizationAndMembersFromUserId,
     getSubscriptionTier,
     updateOrganizationName,
     updateOrganizationSpendLimit,
@@ -21,7 +22,7 @@ const OrganizationPage = () => {
     const [organizationId, setOrganizationId] = useState<string>("");
     const [newMemberEmail, setNewMemberEmail] = useState<string>("");
     const [customSpendLimit, setCustomSpendLimit] = useState<number>(0.0);
-    const [subscriptionTier, setSubscriptionTier] = useState<string>("");
+    const [subscriptionTier, setSubscriptionTier] = useState<string>("FREE");
     const [creating, setCreating] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [isUpdating, setIsUpdating] = useState(false);
@@ -56,6 +57,9 @@ const OrganizationPage = () => {
             const initSubscriptionTier = async () => {
                 const tier = await getSubscriptionTier(user.id);
                 setSubscriptionTier(tier!);
+                const { organization } =
+                    await getOrganizationAndMembersFromUserId(user.id);
+                setCustomSpendLimit(organization?.spendLimit ?? 0);
             };
             initSubscriptionTier();
         }
@@ -178,7 +182,8 @@ const OrganizationPage = () => {
                     {isLoading && <LoadingIndicator />}
                     {organization && (
                         <>
-                            <div className='flex gap-4'>
+                            <div className='flex items-center'>
+                                <DollarSign className='w-4 h-4 mr-2' />
                                 <Input
                                     placeholder='Spend limit'
                                     value={customSpendLimit}
@@ -187,7 +192,7 @@ const OrganizationPage = () => {
                                             parseFloat(e.target.value)
                                         )
                                     }
-                                    className='flex-1'
+                                    className='flex-1 mr-4'
                                 />
                                 <Button onClick={handleUpdateSpendLimit}>
                                     Update Spend Alert Limit
@@ -211,11 +216,6 @@ const OrganizationPage = () => {
                                     </Button>
                                 </div>
                             )}
-                            <div className='text-xl rounded-lg space-y-3'>
-                                <div className='flex items-center justify-between'>
-                                    <h3 className='font-medium'>Members</h3>
-                                </div>
-                            </div>
                         </>
                     )}
                     <OrganizationMembersList />

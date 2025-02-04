@@ -18,6 +18,7 @@ import {
     upgradeUserSubscription,
 } from "@/app/actions";
 import { upgradeDisabled } from "@/global";
+import LoadingIndicator from "../shared/LoadingIndicator";
 
 // Stripe initialization
 const stripePromise = loadStripe(
@@ -135,8 +136,8 @@ const PaymentForm = ({
                 {loading
                     ? "Processing..."
                     : planId === "PRO"
-                    ? "Upgrade"
-                    : "Downgrade"}
+                      ? "Upgrade"
+                      : "Downgrade"}
             </button>
         </form>
     );
@@ -167,8 +168,9 @@ export default function SubscriptionPage() {
             name: "Free Tier",
             price: 0,
             features: [
-                "Up to 1000$ AI spend",
+                "Small projects",
                 "Basic cost tracking",
+                "Caching optimization",
                 "Email alerts",
             ],
         },
@@ -177,7 +179,8 @@ export default function SubscriptionPage() {
             name: "Pro Tier",
             price: 200,
             features: [
-                "Up to 10,000$ AI spend",
+                "Up to 5 team members",
+                "Cost Tracking",
                 "All optimization tools",
                 "Real-time alerts",
             ],
@@ -186,7 +189,10 @@ export default function SubscriptionPage() {
 
     return (
         <div className='container mx-auto p-6 max-w-2xl'>
-            <h1 className='text-2xl font-bold mb-6'>Choose Your Plan</h1>
+            <div className='flex items-center gap-2 mb-6'>
+                <h2 className='text-2xl font-semibold'>Manage Subscription</h2>
+                {loading && <LoadingIndicator />}
+            </div>
 
             <div className='grid md:grid-cols-2 gap-6'>
                 {plans.map((plan) => (
@@ -240,6 +246,84 @@ export default function SubscriptionPage() {
                         )}
                     </div>
                 ))}
+            </div>
+
+            <div>
+                <div className='max-w-screen-xl mx-auto my-10'>
+                    <div className='border rounded-lg text-center bg-white shadow-md overflow-auto'>
+                        <table className='w-full border-collapse rounded-lg '>
+                            <thead>
+                                <tr className='bg-gray-100 text-gray-700'>
+                                    <th className='py-4 px-6 text-left'>
+                                        Features
+                                    </th>
+                                    <th className='py-4 px-6 text-center'>
+                                        Free
+                                    </th>
+                                    <th className='py-4 px-6 text-center border-t-2  border-x-2 border-blue-600'>
+                                        Pro
+                                    </th>
+                                    <th className='py-4 px-6 text-center'>
+                                        Enterprise
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr className='border-t border-gray-200'>
+                                    <td className='py-4 px-6 text-left'>
+                                        Daily API Calls*
+                                    </td>
+                                    <td className='py-4 px-6 text-center'>
+                                        50
+                                    </td>
+                                    <td className='py-4 px-6 text-center border-x-2 border-blue-600'>
+                                        1000
+                                    </td>
+                                    <td className='py-4 px-6 text-center'>
+                                        Unlimited
+                                    </td>
+                                </tr>
+                                <tr className='border-t border-gray-200'>
+                                    <td className='py-4 px-6 text-left'>
+                                        Monthly API Calls*
+                                    </td>
+                                    <td className='py-4 px-6 text-center'>
+                                        500
+                                    </td>
+                                    <td className='py-4 px-6 text-center border-x-2 border-blue-600'>
+                                        10,000
+                                    </td>
+                                    <td className='py-4 px-6 text-center'>
+                                        Unlimited
+                                    </td>
+                                </tr>
+                                <tr className='border-t border-gray-200'>
+                                    <td className='py-4 px-6 text-left'>
+                                        Team members
+                                    </td>
+                                    <td className='py-4 px-6 text-center'>1</td>
+                                    <td className='py-4 px-6 text-center border-x-2 border-b-2 border-blue-600'>
+                                        5
+                                    </td>
+                                    <td className='py-4 px-6 text-center'>
+                                        Custom
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div>
+                <div className='max-w-screen-xl mx-auto mb-10'>
+                    <p className='border rounded-lg p-4 text-bold shadow-md'>
+                        *Note: The limitations in API calls only apply to the
+                        service shousai provides. Your API calls to OpenAI and
+                        Anthropic models are still going through, but will not
+                        be included in your dashboard overview or optimised.
+                    </p>
+                </div>
             </div>
         </div>
     );

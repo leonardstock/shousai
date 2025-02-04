@@ -41,8 +41,6 @@ export async function upgradeUserSubscription(
                 stripeSubscriptionId,
                 status: "active",
                 startDate: new Date(),
-                monthlyUsageLimit: UsageManager.TIER_LIMITS.PRO.monthlyLimit,
-                dailyUsageLimit: UsageManager.TIER_LIMITS.PRO.dailyLimit,
             },
         });
     } catch (error) {
@@ -65,8 +63,6 @@ export async function downgradeUserSubscription(
                 stripeSubscriptionId,
                 status: "active",
                 startDate: new Date(),
-                monthlyUsageLimit: UsageManager.TIER_LIMITS.FREE.monthlyLimit,
-                dailyUsageLimit: UsageManager.TIER_LIMITS.FREE.dailyLimit,
             },
         });
     } catch (error) {

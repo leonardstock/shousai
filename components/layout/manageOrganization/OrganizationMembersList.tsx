@@ -9,6 +9,7 @@ import {
 import { User } from "@prisma/client";
 import {
     getOrganizationAndMembersFromUserId,
+    getSubscriptionTier,
     removeMemberFromOrganization,
 } from "@/app/actions";
 import { Button } from "@/components/shared/Button";
@@ -20,6 +21,7 @@ export function OrganizationMembersList() {
     const [userRole, setUserRole] = useState<string>("");
     const [isLoading, setIsLoading] = useState(true);
     const [organizationId, setOrganizationId] = useState<string>("");
+    const [subscriptionTier, setSubscriptionTier] = useState("FREE");
 
     useEffect(() => {
         if (user) {
@@ -28,6 +30,8 @@ export function OrganizationMembersList() {
                     const { members } =
                         await getOrganizationAndMembersFromUserId(user?.id);
                     setMembers(members);
+                    const tier = await getSubscriptionTier(user.id);
+                    setSubscriptionTier(tier!);
                 } catch (error) {
                     console.error("Failed to fetch members:", error);
                 } finally {
@@ -59,21 +63,38 @@ export function OrganizationMembersList() {
 
     return (
         <>
+            <div className='text-xl rounded-lg space-y-3'>
+                <div className='flex items-center justify-between'>
+                    <h3 className='font-medium'>Members ({members.length})</h3>
+                </div>
+            </div>
             {isLoading && <LoadingIndicator />}
-            {members.length === 1 && !isLoading && (
+            {subscriptionTier === "FREE" && !isLoading && (
                 <div className='text-muted-foreground text-center'>
-                    No other members found
+                    Head over to Manage Subscription to upgrade to Pro tier and
+                    invite others to your team!
                 </div>
             )}
 
-            {members.length > 1 &&
+            {subscriptionTier !== "FREE" &&
+                members.length === 1 &&
+                !isLoading && (
+                    <div className='text-muted-foreground text-center'>
+                        No other users found. Invite your colleagues!
+                    </div>
+                )}
+
+            {!isLoading &&
+                members.length > 1 &&
                 members.map((member) => (
                     <Card key={member.id}>
                         <CardHeader>
                             <CardTitle>
                                 <div className='flex items-center justify-between'>
                                     <div>
-                                        {member.firstName} {member.lastName}
+                                        {member.id === user?.id
+                                            ? "You"
+                                            : `${member.firstName} ${member.lastName}`}
                                     </div>
                                     {userRole === "org:admin" && (
                                         <div className='flex items-center gap-2'>

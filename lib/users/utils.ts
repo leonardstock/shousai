@@ -1,7 +1,6 @@
 import { clerkClient } from "@clerk/nextjs/server";
 import { prisma } from "@/lib/db/prisma";
 import { SubscriptionTier } from "@prisma/client";
-import { UsageManager } from "../usage/usageManager";
 
 export const getOrganizationIdFromUserId = async (userId: string) => {
     const client = await clerkClient();
@@ -27,10 +26,7 @@ export async function createUserWithFreeTier(userData: {
                     create: {
                         tier: "FREE",
                         status: "active",
-                        monthlyUsageLimit:
-                            UsageManager.TIER_LIMITS.FREE.monthlyLimit,
-                        dailyUsageLimit:
-                            UsageManager.TIER_LIMITS.FREE.dailyLimit,
+                        startDate: new Date(),
                     },
                 },
             },
