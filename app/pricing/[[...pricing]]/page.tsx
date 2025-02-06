@@ -1,6 +1,5 @@
 "use client";
 
-import Footer from "@/components/layout/Footer";
 import { CheckCircle } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
@@ -204,8 +203,6 @@ export default function PricingPage() {
                     </p>
                 </div>
             </div>
-
-            <Footer />
         </div>
     );
 }

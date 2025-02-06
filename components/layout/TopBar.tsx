@@ -69,15 +69,14 @@ export default function TopBar() {
                     )}
                 </div>
                 <div className='hidden lg:flex lg:flex-1 lg:justify-end'>
-                    <div
-                        className={`flex flex-row gap-4 ${
-                            user?.id
-                                ? ""
-                                : "background-gradient text-white items-center lg:px-6 px-4 py-2 rounded-lg"
-                        }`}>
+                    <div className={`flex flex-row`}>
                         <>
                             <SignedOut>
-                                <SignInButton />
+                                <SignInButton>
+                                    <button className='background-gradient text-white items-center lg:px-6 px-4 py-2 rounded-lg'>
+                                        Sign In
+                                    </button>
+                                </SignInButton>
                             </SignedOut>
                             <SignedIn>
                                 <CustomUserButton />
@@ -154,9 +153,9 @@ export default function TopBar() {
                             <div className='py-6'>
                                 <div
                                     className={`flex flex-row gap-4 ${
-                                        user?.id
-                                            ? ""
-                                            : "background-gradient text-white items-center lg:px-6 px-4 py-2 rounded-lg w-fit"
+                                        !user?.id
+                                            ? "background-gradient text-white items-center lg:px-6 px-4 py-2 rounded-lg w-fit"
+                                            : ""
                                     }`}
                                     onClick={() => {
                                         if (!user?.id) {

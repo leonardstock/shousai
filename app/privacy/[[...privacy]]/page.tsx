@@ -1,63 +1,137 @@
 const PrivacyPage = () => {
     return (
-        <div className='max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 pt-20 pb-16'>
-            <h1 className='text-l font-bold text-gray-900 mb-6'>
+        <div className='max-w-4xl mx-auto px-6 py-16 text-gray-800'>
+            <h1 className='text-3xl font-bold text-gray-900 mb-4'>
                 Our Privacy Policy
             </h1>
-            <i className='text-sm'>Last updated: 29th January 2025</i>
-            <br />
-            <p className='text-sm'>
-                Your privacy is important to us. This Privacy Policy explains
-                how we handle any data collected when you visit our website,
-                shousai.co.uk.
+            <p className='text-sm text-gray-500 mb-8'>
+                Last updated: 6th February 2025
             </p>
-            <h3 className='text-md font-semibold text-gray-900 mt-2'>
-                1. Information We Do Not Collect
-            </h3>
-            <p className='text-sm'>
-                We do not collect or store any personal information from
-                visitors to our website. We do not use cookies or any tracking
-                technologies that store identifiable data.
-            </p>
-            <h3 className='text-md font-semibold text-gray-900 mt-2'>
-                2. Data Collection for Analytics
-            </h3>
-            <p className='text-sm'>
-                Our website platform may collect certain anonymous data for
-                analytics purposes. This data is limited to non-identifiable
-                information typically contained in HTTP headers, such as:
-            </p>
-            <ul className='list-disc list-inside text-sm'>
-                <li className='list-disc'>Browser type</li>
-                <li className='list-disc'>Device type</li>
-                <li className='list-disc'>Referring website</li>
-                <li className='list-disc'>Date and time of access</li>
-            </ul>
-            <h3 className='text-md font-semibold text-gray-900 mt-2'>
-                3. Use of Collected Data
-            </h3>
-            <p className='text-sm'>
-                The anonymous data collected is used only for aggregated website
-                analytics. This helps us understand general trends in website
-                usage, such as visitor counts and page views, without
-                identifying individual users.
-            </p>
-            <h3 className='text-md font-semibold text-gray-900 mt-2'>
-                4. Data Sharing
-            </h3>
-            <p className='text-sm'>
-                We do not share, sell, or otherwise disclose any information
-                collected from visitors to our website.
-            </p>
-            <h3 className='text-md font-semibold text-gray-900 mt-2'>
-                5. Contact Us
-            </h3>
-            <p className='text-sm'>
-                If you have any questions about this Privacy Policy, please
-                contact us: <br />
-                Email: contact@shousai.co.uk <br />
-                Address: 11 Grange Road, Manchester, M21 9NZ
-            </p>
+
+            <div className='space-y-6'>
+                <p>
+                    Welcome to <span className='font-semibold'>shousai</span>!
+                    We are committed to protecting your privacy and ensuring
+                    that your personal information is handled responsibly. This
+                    Privacy Policy outlines the types of personal information we
+                    collect, how we use it, and the measures we take to
+                    safeguard your data when you use our services.
+                </p>
+
+                <h2 className='text-xl font-semibold'>
+                    1. Information We Collect
+                </h2>
+                <p>
+                    When you use <span className='font-semibold'>shousai</span>
+                    &apos;s services, we may collect the following types of
+                    information:
+                </p>
+                <ul className='list-disc list-inside space-y-2'>
+                    <li>
+                        <span className='font-semibold'>
+                            Personal Information:
+                        </span>{" "}
+                        Your name, email address, and billing information.
+                    </li>
+                    <li>
+                        <span className='font-semibold'>Usage Data:</span> How
+                        you interact with the web app, including pages visited
+                        and features used.
+                    </li>
+                    <li>
+                        <span className='font-semibold'>
+                            Device Information:
+                        </span>{" "}
+                        Details about the device you use, such as type and
+                        operating system.
+                    </li>
+                </ul>
+
+                <h2 className='text-xl font-semibold'>
+                    2. How We Use Your Information
+                </h2>
+                <p>We use the collected information to:</p>
+                <ul className='list-disc list-inside space-y-2'>
+                    <li>
+                        <span className='font-semibold'>Provide Services:</span>{" "}
+                        Ensure a seamless user experience and enable access to
+                        billing.
+                    </li>
+                    <li>
+                        <span className='font-semibold'>Customer Support:</span>{" "}
+                        Respond to inquiries and address issues.
+                    </li>
+                    <li>
+                        <span className='font-semibold'>Improve Services:</span>{" "}
+                        Analyze usage patterns and enhance functionality.
+                    </li>
+                    <li>
+                        <span className='font-semibold'>Communications:</span>{" "}
+                        Send updates, promotional offers, and relevant
+                        information.
+                    </li>
+                </ul>
+
+                <h2 className='text-xl font-semibold'>3. Data Security</h2>
+                <p>
+                    We implement industry-standard measures to protect your
+                    personal information from unauthorized access, disclosure,
+                    and destruction.
+                </p>
+
+                <h2 className='text-xl font-semibold'>
+                    4. Sharing Your Information
+                </h2>
+                <p>
+                    We do not sell or rent your personal data. However, we may
+                    share it in the following cases:
+                </p>
+                <ul className='list-disc list-inside space-y-2'>
+                    <li>
+                        <span className='font-semibold'>
+                            Service Providers:
+                        </span>{" "}
+                        Third parties assisting in delivering our services.
+                    </li>
+                    <li>
+                        <span className='font-semibold'>Legal Compliance:</span>{" "}
+                        If required by law or legal requests.
+                    </li>
+                </ul>
+
+                <h2 className='text-xl font-semibold'>5. Your Choices</h2>
+                <p>
+                    You can access, correct, or delete your personal
+                    information. You can also opt out of promotional
+                    communications.
+                </p>
+
+                <h2 className='text-xl font-semibold'>
+                    6. Changes to This Privacy Policy
+                </h2>
+                <p>
+                    We may update this policy to reflect changes in our
+                    practices. We will notify you of significant updates.
+                </p>
+
+                <h2 className='text-xl font-semibold'>7. Contact Us</h2>
+                <p>
+                    For any questions or concerns, please contact us at
+                    <a
+                        href='mailto:support@shousai.co.uk'
+                        className='text-blue-600 hover:underline'>
+                        {" "}
+                        support@shousai.co.uk
+                    </a>
+                    .
+                </p>
+
+                <p>
+                    Thank you for choosing{" "}
+                    <span className='font-semibold'>shousai</span>. We are
+                    dedicated to optimizing your experience.
+                </p>
+            </div>
         </div>
     );
 };

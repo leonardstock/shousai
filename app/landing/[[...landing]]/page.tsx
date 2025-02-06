@@ -1,6 +1,5 @@
 "use client";
 
-import Footer from "@/components/layout/Footer";
 import { ArrowRight, LineChart, Shield, Zap } from "lucide-react";
 import { redirect } from "next/navigation";
 
@@ -132,7 +131,6 @@ export default function LandingPage() {
                     </button>
                 </div>
             </div>
-            <Footer />
         </div>
     );
 }

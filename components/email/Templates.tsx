@@ -14,7 +14,7 @@ const EmailTemplate = ({ children }: { children: React.ReactNode }) => (
                 {children}
                 <hr className='my-8 border-gray-200' />
                 <div className='text-center text-gray-500 text-sm'>
-                    <p>© 2025 Lower m Ltd. All rights reserved.</p>
+                    <p>© 2025 Shousai Ltd. All rights reserved.</p>
                     <p className='mt-2'>
                         If you didn&apos;t request this email, please ignore it
                         or contact support.
