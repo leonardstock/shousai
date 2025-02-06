@@ -1,30 +1,35 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<!-- Created with Inkscape (http://www.inkscape.org/) -->
-<svg
-   xmlns:svg="http://www.w3.org/2000/svg"
-   xmlns="http://www.w3.org/2000/svg"
-   version="1.0"
-   width="466"
-   height="466"
-   viewBox="0 0 466 466"
-   id="svg2">
-  <defs
-     id="defs4" >
-     <linearGradient id="Gradient1">
-      <stop stop-color="rgba(131, 58, 180, 1)" offset="38%" />
-      <stop stop-color="rgba(253, 29, 29, 1)" offset="60%" />
-      <stop stop-color="rgba(252, 176, 69, 1) 100%)" offset="100%" />
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+     width="1080" height="1080" viewBox="0 0 1080 1080">
+  
+  <defs>
+    <!-- Define the gradient for the bar -->
+    <linearGradient id="gradientBar" x1="0%" y1="50%" x2="100%" y2="50%">
+      <stop offset="18%" stop-color="rgb(131, 58, 180)"/>
+      <stop offset="60%" stop-color="rgb(253, 29, 29)"/>
+      <stop offset="100%" stop-color="rgb(252, 176, 69)"/>
     </linearGradient>
-   </defs>
-  <g
-     id="g1878">
-    <path
-       d="M 464.25991,232.70792 C 464.25991,359.73341 361.2854,462.70792 234.25991,462.70792 C 107.23442,462.70792 4.25991,359.73341 4.25991,232.70792 C 4.25991,105.68243 107.23442,2.70792 234.25991,2.70792 C 361.2854,2.70792 464.25991,105.68243 464.25991,232.70792 L 464.25991,232.70792 z "
-       style="fill:white"
-       id="path1366" />
-    <path
-       d="M 217.17036,463.60849 C 117.52316,458.41224 27.786532,380.7896 7.342412,283.34465 C -11.458788,201.9887 17.988072,111.96646 81.772102,57.928085 C 127.02669,18.567735 187.84467,-2.178305 247.75244,2.337125 C 342.62764,6.189105 429.49182,76.503925 455.04647,167.69849 C 465.52201,201.212 465.49258,237.19059 461.26209,271.70787 C 446.84632,359.60219 377.70997,435.51453 291.02764,456.75751 C 267.06004,462.64806 241.81256,465.71481 217.17036,463.60849 z M 181.67036,449.42398 C 139.39823,428.67406 113.26504,380.60359 119.25954,333.83362 C 124.04929,278.70063 174.20543,233.14044 229.33596,232.15417 C 275.492,233.57743 321.01195,204.87703 337.78122,161.56336 C 357.86092,114.20563 340.50486,54.765915 297.84394,25.843565 C 262.87444,0.064855 216.08548,5.532375 176.28582,14.492005 C 84.287812,37.040985 13.156312,123.20543 8.016672,217.71721 C 1.305842,303.00959 48.267052,389.10962 123.40784,429.93131 C 142.22473,440.09406 168.94571,451.97113 186.54943,452.21437 L 184.60224,451.02285 L 181.67037,449.42398 L 181.67036,449.42398 z "
-       fill="url(#Gradient1)"
-       id="path1351" />
+
+    <!-- CSS to adapt the color based on user preference -->
+    <style>
+      @media (prefers-color-scheme: dark) {
+        .o-shape { fill: none; stroke: white; }
+      }
+      @media (prefers-color-scheme: light) {
+        .o-shape { fill: none; stroke: black; }
+      }
+    </style>
+  </defs>
+
+  <!-- Circle "O" -->
+  <g transform="translate(190 240) scale(7.22)">
+    <circle class="o-shape" cx="50" cy="50" r="41" stroke-width="5"/>
   </g>
+
+  <!-- Bar on top with gradient -->
+  <g transform="translate(550 200) scale(7.72 0.44)">
+    <rect x="-33.0835" y="-33.0835" width="65.167" height="100.167"
+          fill="url(#gradientBar)"/>
+  </g>
+
 </svg>
