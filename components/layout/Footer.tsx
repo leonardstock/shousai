@@ -20,6 +20,11 @@ const Footer = () => {
                         className='termly-display-preferences text-gray-300 hover:text-white'>
                         Cookie Preferences
                     </a>
+                    <Link
+                        href={"/terms"}
+                        className='text-gray-300 hover:text-white'>
+                        Terms and Conditions
+                    </Link>
                 </div>
             </div>
         </div>

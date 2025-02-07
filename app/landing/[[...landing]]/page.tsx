@@ -51,11 +51,14 @@ export default function LandingPage() {
                             </div>
                         </div>
                         <div>
-                            <div className='text-3xl font-bold text-gray-900'>
-                                Varies depending on usage patterns
+                            <div className='text-3xl flex justify-center font-bold text-gray-900'>
+                                Up to 30%<span className='text-xs'>*</span>
                             </div>
                             <div className='text-gray-600'>
                                 Average Cost Reduction
+                            </div>
+                            <div className='text-xs'>
+                                * varies based on usage pattern
                             </div>
                         </div>
                         <div>
@@ -123,9 +126,7 @@ export default function LandingPage() {
                         Join the beta program now!
                     </p>
                     <button
-                        onClick={() =>
-                            window.scrollTo({ top: 0, behavior: "smooth" })
-                        }
+                        onClick={() => redirect("/signup")}
                         className='px-8 py-3 background-gradient text-white rounded-lg font-medium hover:bg-blue-700'>
                         Get Started
                     </button>
