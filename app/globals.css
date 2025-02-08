@@ -30,7 +30,8 @@ body {
 }
 
 .border-gradient {
-    background: linear-gradient(white, white) padding-box,
+    background:
+        linear-gradient(white, white) padding-box,
         linear-gradient(
                 to right,
                 rgba(131, 58, 180, 1) 18%,
@@ -38,7 +39,6 @@ body {
                 rgba(252, 176, 69, 1) 100%
             )
             border-box;
-    border-radius: 50em;
     border: 4px solid transparent;
 }
 
