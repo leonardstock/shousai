@@ -57,9 +57,9 @@ export default function LandingPage() {
                                     <span className="after:content-['*']">
                                         up to 40%
                                     </span>{" "}
-                                    on your OpenAI costs with intelligent
-                                    caching and optimization. Built by
-                                    developers, for developers.
+                                    on your ChatGPT and Claude costs with
+                                    intelligent caching and optimizations. Built
+                                    by developers, for developers.
                                 </p>
                                 <div className='mt-5 sm:mt-8 sm:flex sm:justify-center'>
                                     <div className='rounded-md shadow'>
@@ -106,12 +106,12 @@ export default function LandingPage() {
                                 height={139}
                             />
                         </div>
-                        <div className='col-span-1 flex justify-center items-center grayscale opacity-40'>
+                        {/* Repeat for other logos */}
+                        <div className='md:col-span-1 col-span-2 flex justify-center items-center grayscale opacity-40'>
                             <div className='h-8 text-gray-600'>
                                 Your AI startup
                             </div>
                         </div>
-                        {/* Repeat for other logos */}
                     </div>
                 </div>
             </div>
@@ -166,10 +166,10 @@ export default function LandingPage() {
             {/* Code Example */}
             <div className='bg-gray-50 py-16'>
                 <div className='max-w-7xl mx-auto px-4 sm:px-6 lg:px-8'>
-                    <div className='lg:flex lg:justify-between lg:items-center'>
+                    <div className='lg:flex lg:justify-between lg:gap-x-8 lg:items-center'>
                         <div>
                             <h2 className='text-3xl font-extrabold text-gray-900'>
-                                Integration as Simple as One Line
+                                Integration In One Comprehensive Call
                             </h2>
                             <p className='mt-3 text-lg text-gray-500'>
                                 Replace your existing AI API calls with our
@@ -211,7 +211,7 @@ export default function LandingPage() {
                     <button
                         className='mt-8 w-full inline-flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-indigo-600 bg-white hover:bg-indigo-50 sm:w-auto'
                         onClick={handleSubmit}>
-                        Get Started Free
+                        Get Started For Free
                         <ArrowRight className='ml-2 h-5 w-5' />
                     </button>
                 </div>

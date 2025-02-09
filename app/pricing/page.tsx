@@ -199,7 +199,7 @@ export default function PricingPage() {
                         *Note: The limitations in API calls only apply to the
                         service shousai provides. Your API calls to OpenAI and
                         Anthropic models are still going through, but will not
-                        be included in your dashboard overview or optimised.
+                        be tracked in your dashboard overview or optimized.
                     </p>
                 </div>
             </div>
