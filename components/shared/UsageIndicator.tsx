@@ -42,13 +42,13 @@ const UsageIndicator = ({ type }: UsageIndicatorProps) => {
         usagePercentage < 50
             ? "green"
             : usagePercentage < 80
-            ? "yellow"
-            : "#ef4444";
+              ? "yellow"
+              : "#ef4444";
 
     return (
         <div className='w-full h-6 bg-gray-200 rounded-lg relative'>
             <div
-                className='h-full rounded-l-lg transition-all'
+                className='h-full rounded-lg transition-all'
                 style={{ width: `${usagePercentage}%`, backgroundColor: color }}
             />
             <div className='absolute inset-0 flex justify-center items-center text-sm text-black'>

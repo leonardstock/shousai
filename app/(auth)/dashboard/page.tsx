@@ -86,7 +86,7 @@ const CostDashboard = () => {
     }, [timeRange, provider, model]);
 
     return (
-        <div className='w-full max-w-screen-xl mx-auto p-4 space-y-6'>
+        <div className='w-full p-4 space-y-6'>
             {!organization && <NoOrgHint />}
             {/* {usageData && <SavingsCalculator usageData={usageData} />} */}
             <div className='flex flex-col md:flex-row justify-between md:items-center'>

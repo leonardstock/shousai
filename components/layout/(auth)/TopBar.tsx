@@ -5,9 +5,8 @@ import { useCallback, useState } from "react";
 import { Dialog, DialogPanel } from "@headlessui/react";
 import { SignedIn, SignedOut, SignInButton, useUser } from "@clerk/nextjs";
 import Link from "next/link";
-import CustomUserButton from "./CustomUserButton";
+import CustomUserButton from "../CustomUserButton";
 import { usePathname, useRouter } from "next/navigation";
-import NavLinks from "./NavLinks";
 
 export default function TopBar() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -30,7 +29,7 @@ export default function TopBar() {
         <header className='bg-white'>
             <nav
                 aria-label='Global'
-                className='mx-auto flex max-w-screen-xl items-center justify-between p-4'>
+                className='mx-auto flex items-center justify-between p-4'>
                 <div className='flex lg:flex-1'>
                     <Link href='/'>
                         <div className='logo'>
@@ -46,27 +45,6 @@ export default function TopBar() {
                         <span className='sr-only'>Open main menu</span>
                         <Menu aria-hidden='true' className='size-6' />
                     </button>
-                </div>
-                <div className='hidden lg:flex lg:gap-x-12'>
-                    {user?.id && (
-                        <div className='flex flex-row gap-4 ms-10 '>
-                            <NavLinks />
-                        </div>
-                    )}
-                    {!user?.id && (
-                        <Link href='/reference'>
-                            <div className='landing-nav-link navLink'>
-                                Guide
-                            </div>
-                        </Link>
-                    )}
-                    {!user?.id && (
-                        <Link href='/pricing'>
-                            <div className='landing-nav-link navLink'>
-                                Pricing
-                            </div>
-                        </Link>
-                    )}
                 </div>
                 <div className='hidden lg:flex lg:flex-1 lg:justify-end'>
                     <div className={`flex flex-row`}>
@@ -90,7 +68,7 @@ export default function TopBar() {
                 onClose={setMobileMenuOpen}
                 className='lg:hidden'>
                 <div className='fixed inset-0 z-10' />
-                <DialogPanel className='fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10'>
+                <DialogPanel className='fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white p-4 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10'>
                     <div className='flex items-center justify-between'>
                         <div
                             onClick={() => {

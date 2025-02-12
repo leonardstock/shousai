@@ -4,9 +4,7 @@ import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import "./globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
-import TopBar from "@/components/layout/TopBar";
 import TermlyCMP from "@/components/TermlyCMP";
-import Footer from "@/components/layout/Footer";
 import { Suspense } from "react";
 
 const inter = Inter({
@@ -29,8 +27,7 @@ export default function RootLayout({
         <ClerkProvider afterSignOutUrl='/'>
             <html lang='en'>
                 <body
-                    className={`${inter.className} antialiased flex flex-col`}
-                    style={{ minHeight: "100vh" }}>
+                    className={`${inter.className} antialiased flex flex-col`}>
                     <Suspense>
                         <TermlyCMP
                             websiteUUID={WEBSITE_UUID}
@@ -38,9 +35,7 @@ export default function RootLayout({
                             masterConsentsOrigin={undefined}
                         />
                     </Suspense>
-                    <TopBar />
                     {children}
-                    <Footer />
                     <Analytics />
                     <SpeedInsights />
                 </body>
