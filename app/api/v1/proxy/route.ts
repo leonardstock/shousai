@@ -18,6 +18,7 @@ import { z } from "zod";
 const requestSchema = z.object({
     apiKey: z.string().min(1, "API key is required"),
     providerKey: z.string().min(1, "Provider API key is required"),
+    maxTokens: z.number().optional(),
     model: z.string().min(1, "Model is required"),
     noCache: z.boolean().optional(),
     messages: z
@@ -51,8 +52,13 @@ const PROVIDER_CONFIGS = {
             "anthropic-version": "2023-06-01",
             "Content-Type": "application/json",
         }),
-        formatRequest: (model: string, messages: any[]) => ({
+        formatRequest: (
+            model: string,
+            messages: any[],
+            maxTokens: number | undefined
+        ) => ({
             model,
+            max_tokens: maxTokens ?? 1024,
             messages: messages.map((msg) => ({
                 role: msg.role === "user" ? "user" : "assistant",
                 content: msg.content,
@@ -64,7 +70,7 @@ const PROVIDER_CONFIGS = {
 
 export async function POST(req: Request) {
     try {
-        const { apiKey, providerKey, model, messages, noCache } =
+        const { apiKey, providerKey, model, maxTokens, messages, noCache } =
             requestSchema.parse(await req.json());
 
         if (!process.env.UPSTASH_REDIS_REST_URL) {
@@ -174,7 +180,9 @@ export async function POST(req: Request) {
         const response = await fetch(providerConfig.url, {
             method: "POST",
             headers: providerConfig.headers(providerKey),
-            body: JSON.stringify(providerConfig.formatRequest(model, messages)),
+            body: JSON.stringify(
+                providerConfig.formatRequest(model, messages, maxTokens)
+            ),
         });
 
         if (!response.ok) {
