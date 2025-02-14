@@ -3,16 +3,14 @@
 import { Menu, X } from "lucide-react";
 import { useCallback, useState } from "react";
 import { Dialog, DialogPanel } from "@headlessui/react";
-import { SignedIn, SignedOut, SignInButton, useUser } from "@clerk/nextjs";
+import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import Link from "next/link";
 import CustomUserButton from "../CustomUserButton";
 import { usePathname, useRouter } from "next/navigation";
-import NavLinks from "../NavLinks";
 
 export default function TopBar() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-    const { user } = useUser();
     const router = useRouter();
     const currentRoute = usePathname();
 
@@ -48,25 +46,12 @@ export default function TopBar() {
                     </button>
                 </div>
                 <div className='hidden lg:flex lg:gap-x-12'>
-                    {user?.id && (
-                        <div className='flex flex-row gap-4 ms-10 '>
-                            <NavLinks />
-                        </div>
-                    )}
-                    {!user?.id && (
-                        <Link href='/reference'>
-                            <div className='landing-nav-link navLink'>
-                                Guide
-                            </div>
-                        </Link>
-                    )}
-                    {!user?.id && (
-                        <Link href='/pricing'>
-                            <div className='landing-nav-link navLink'>
-                                Pricing
-                            </div>
-                        </Link>
-                    )}
+                    <Link href='/reference'>
+                        <div className='landing-nav-link navLink'>Guide</div>
+                    </Link>
+                    <Link href='/pricing'>
+                        <div className='landing-nav-link navLink'>Pricing</div>
+                    </Link>
                 </div>
                 <div className='hidden lg:flex lg:flex-1 lg:justify-end'>
                     <div className={`flex flex-row`}>
@@ -111,21 +96,6 @@ export default function TopBar() {
                     <div className='mt-6 flow-root'>
                         <div className='-my-6 divide-y divide-gray-500/10'>
                             <div className='space-y-2 py-6'>
-                                {user?.id && (
-                                    <div
-                                        onClick={() =>
-                                            handleNavigation("/dashboard")
-                                        }>
-                                        <div
-                                            className={`landing-nav-link navLink py-2 w-fit ${
-                                                currentRoute === "/dashboard"
-                                                    ? "active"
-                                                    : ""
-                                            }`}>
-                                            Dashboard
-                                        </div>
-                                    </div>
-                                )}
                                 <div
                                     onClick={() =>
                                         handleNavigation("/reference")
@@ -139,37 +109,22 @@ export default function TopBar() {
                                         Guide
                                     </div>
                                 </div>
-                                {!user?.id && (
-                                    <div
-                                        onClick={() =>
-                                            handleNavigation("/pricing")
-                                        }>
-                                        <div className='landing-nav-link navLink w-fit'>
-                                            Pricing
-                                        </div>
+                                <div
+                                    onClick={() =>
+                                        handleNavigation("/pricing")
+                                    }>
+                                    <div className='landing-nav-link navLink w-fit'>
+                                        Pricing
                                     </div>
-                                )}
+                                </div>
                             </div>
                             <div className='py-6'>
                                 <div
-                                    className={`flex flex-row gap-4 ${
-                                        !user?.id
-                                            ? "background-gradient text-white items-center lg:px-6 px-4 py-2 rounded-lg w-fit"
-                                            : ""
-                                    }`}
+                                    className={`flex flex-row gap-4 background-gradient text-white items-center lg:px-6 px-4 py-2 rounded-lg w-fit`}
                                     onClick={() => {
-                                        if (!user?.id) {
-                                            setMobileMenuOpen(false);
-                                        }
+                                        setMobileMenuOpen(false);
                                     }}>
-                                    <>
-                                        <SignedOut>
-                                            <SignInButton />
-                                        </SignedOut>
-                                        <SignedIn>
-                                            <CustomUserButton />
-                                        </SignedIn>
-                                    </>
+                                    <SignInButton />
                                 </div>
                             </div>
                         </div>

@@ -81,4 +81,9 @@ export const HUMAN_READABLE_NAMES: { [key: string]: string } = {
     "claude-3-5-sonnet-20241022": "Claude 3.5 Sonnet",
 };
 
+export const HUMAN_READABLE_PROVIDER_NAMES: { [key: string]: string } = {
+    openai: "OpenAI",
+    anthropic: "Anthropic",
+};
+
 export type SupportedModel = keyof typeof MODEL_PRICING;

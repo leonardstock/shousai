@@ -17,7 +17,6 @@ import {
     CardTitle,
     CardContent,
 } from "@/components/shared/Card";
-import { Alert, AlertDescription } from "@/components/shared/Alert";
 import { Brain, Building2, Calendar, DollarSign } from "lucide-react";
 import { subDays, subMonths, subYears, format } from "date-fns";
 import { UsageResponse } from "@/models/interfaces/usage";
@@ -25,13 +24,13 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import UsageIndicator from "@/components/shared/UsageIndicator";
 import NoOrgHint from "@/components/setup/NoOrgHint";
 import { useOrganization } from "@clerk/nextjs";
+import { Provider } from "@/models/types/provider";
+import { DateRange } from "@/models/types/dateRange";
+import { HUMAN_READABLE_NAMES } from "@/models/types/supportedModels";
 // import SavingsCalculator from "@/components/shared/SavingsCalculator";
 
-type RangeType = "day" | "week" | "month" | "year";
-type Provider = "all" | "openai" | "anthropic";
-
 async function fetchUsageData(
-    range: RangeType,
+    range: DateRange,
     provider: Provider,
     model: string
 ) {
@@ -63,7 +62,7 @@ async function fetchUsageData(
 
 const CostDashboard = () => {
     const { organization } = useOrganization();
-    const [timeRange, setTimeRange] = useState<RangeType>("week");
+    const [timeRange, setTimeRange] = useState<DateRange>("week");
     const [usageData, setUsageData] = useState<UsageResponse>();
     const [provider, setProvider] = useState<Provider>("all");
     const [model, setModel] = useState<string>("all");
@@ -87,7 +86,7 @@ const CostDashboard = () => {
 
     return (
         <div className='w-full p-4 space-y-6'>
-            {!organization && <NoOrgHint />}
+            {!organization && !isLoading && <NoOrgHint />}
             {/* {usageData && <SavingsCalculator usageData={usageData} />} */}
             <div className='flex flex-col md:flex-row justify-between md:items-center'>
                 <div className='flex items-center gap-5 lg:mb-0 mb-4'>
@@ -115,8 +114,11 @@ const CostDashboard = () => {
                             onChange={(e) => setModel(e.target.value as string)}
                             className='border rounded-md p-2'>
                             <option value='all'>All</option>
-                            <option value='gpt-3.5-turbo'>GPT 3.5</option>
-                            <option value='gpt-4'>GPT 4</option>
+                            {Object.keys(HUMAN_READABLE_NAMES).map((model) => (
+                                <option value={model} key={model}>
+                                    {HUMAN_READABLE_NAMES[model]}
+                                </option>
+                            ))}
                         </select>
                     </div>
                     <div className='flex items-center gap-2'>
@@ -124,7 +126,7 @@ const CostDashboard = () => {
                         <select
                             value={timeRange}
                             onChange={(e) =>
-                                setTimeRange(e.target.value as RangeType)
+                                setTimeRange(e.target.value as DateRange)
                             }
                             className='border rounded-md p-2'>
                             <option value='day'>Last 24h</option>
@@ -135,7 +137,7 @@ const CostDashboard = () => {
                     </div>
                 </div>
             </div>
-            <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
+            <div className='grid grid-cols-1 md:grid-cols-4 gap-4'>
                 <Card>
                     <CardHeader className='flex flex-row items-center justify-between'>
                         <CardTitle>Total Cost</CardTitle>
@@ -176,6 +178,16 @@ const CostDashboard = () => {
                             {usageData?.analytics.summary.total_savings.toFixed(
                                 5
                             )}
+                        </div>
+                    </CardContent>
+                </Card>
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Cached Requests</CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                        <div className='text-2xl font-bold'>
+                            {usageData?.analytics.summary.cached_requests}
                         </div>
                     </CardContent>
                 </Card>
@@ -289,32 +301,6 @@ const CostDashboard = () => {
                     </CardContent>
                 </Card>
             </div>
-            <Alert>
-                <AlertDescription>
-                    <div className='font-medium mb-2'>Usage Breakdown:</div>
-                    <div>
-                        Total Requests:{" "}
-                        {usageData?.analytics.summary.total_requests}
-                    </div>
-                    <div>
-                        Cached Requests:{" "}
-                        {usageData?.analytics.summary.cached_requests}
-                    </div>
-                    {usageData?.logs && (
-                        <div>
-                            Success Rate:{" "}
-                            {(
-                                (usageData?.logs.filter((log) => log.success)
-                                    .length /
-                                    usageData?.analytics.summary
-                                        .total_requests) *
-                                100
-                            ).toFixed(1)}
-                            %
-                        </div>
-                    )}
-                </AlertDescription>
-            </Alert>
         </div>
     );
 };
