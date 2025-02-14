@@ -1,6 +1,7 @@
 /* eslint-disable react/jsx-no-comment-textnodes */
 "use client";
 
+import DemoVideo from "@/components/layout/DemoVideo";
 import { ArrowRight, BarChart, Lock, Zap } from "lucide-react";
 import Image from "next/image";
 import { redirect } from "next/navigation";
@@ -42,7 +43,7 @@ export default function LandingPage() {
             <div className='relative overflow-hidden'>
                 <div className='max-w-7xl mx-auto'>
                     <div className='relative z-10 pb-8 bg-white sm:pb-16 md:pb-20 lg:pb-28 xl:pb-32'>
-                        <main className='mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 xl:mt-28'>
+                        <main className='mt-10 mx-auto max-w-7xl px-4 sm:mt-12 sm:px-6 md:mt-16 lg:mt-20 xl:mt-25'>
                             <div className='text-center'>
                                 <h1 className='text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl'>
                                     <span className='block'>
@@ -61,6 +62,9 @@ export default function LandingPage() {
                                     intelligent caching and optimizations. Built
                                     by developers, for developers.
                                 </p>
+                                <div className='my-10 lg:mb-20'>
+                                    <DemoVideo />
+                                </div>
                                 <div className='mt-5 sm:mt-8 sm:flex sm:justify-center'>
                                     <div className='rounded-md shadow'>
                                         <button
@@ -72,7 +76,7 @@ export default function LandingPage() {
                                     </div>
                                 </div>
                                 <div className='text-xs mt-4 text-gray-600'>
-                                    * varies based on usage pattern
+                                    * savings vary based on usage pattern
                                 </div>
                             </div>
                         </main>
