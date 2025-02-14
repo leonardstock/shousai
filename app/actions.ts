@@ -11,6 +11,13 @@ import { clerkClient } from "@clerk/nextjs/server";
 import { Subscription } from "@prisma/client";
 import { createHash } from "crypto";
 
+interface UsageLogFilters {
+    dateFrom?: Date;
+    dateTo?: Date;
+    model?: string;
+    provider?: string;
+}
+
 export async function getSubscriptionTier(userId: string) {
     try {
         const subscription = await prisma.subscription.findFirst({
@@ -139,6 +146,53 @@ export async function getOrganizationUsageAndLimit(userId: string) {
             dailyUsage: 0,
             monthlyUsage: 0,
         };
+    }
+}
+
+export async function getOrganizationUsageLogsFromUserId(
+    userId: string,
+    filters: UsageLogFilters = {}
+) {
+    try {
+        const { members } = await getOrganizationAndMembersFromUserId(userId);
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const whereClause: any = {
+            userId: { in: members.map((member) => member.id) },
+        };
+
+        // Filter by date range if provided
+        if (filters.dateFrom || filters.dateTo) {
+            whereClause.createdAt = {};
+            if (filters.dateFrom) {
+                whereClause.createdAt.gte = filters.dateFrom;
+            }
+            if (filters.dateTo) {
+                whereClause.createdAt.lte = filters.dateTo;
+            }
+        }
+
+        // Filter by model if provided (only include if not null/undefined)
+        if (filters.model != "all") {
+            whereClause.model = filters.model;
+        }
+
+        // Filter by provider if provided (only include if not null/undefined)
+        if (filters.provider != "all") {
+            whereClause.provider = filters.provider;
+        }
+
+        const result = await prisma.usageLog.findMany({
+            where: whereClause,
+            orderBy: {
+                createdAt: "asc",
+            },
+        });
+
+        return result;
+    } catch (error) {
+        console.error("Error fetching organization usage logs:", error);
+        return [];
     }
 }
 

@@ -3,6 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { House, Logs } from "lucide-react";
 
 export const Sidebar = () => {
     const currentRoute = usePathname();
@@ -24,14 +25,16 @@ export const Sidebar = () => {
                                     ? "bg-blue-500/10"
                                     : ""
                             }`}>
+                            <House className='mr-2 h-4 w-4' />
                             Dashboard
                         </Link>
                         <Link
-                            href='/test'
+                            href='/logs'
                             className={`flex items-center text-[color:--text-color] px-3 py-2 rounded-md hover:bg-blue-500/20 ${
-                                currentRoute === "/test" ? "bg-blue-500/10" : ""
+                                currentRoute === "/logs" ? "bg-blue-500/10" : ""
                             }`}>
-                            Docs
+                            <Logs className='mr-2 h-4 w-4' />
+                            Usage Logs
                         </Link>
                     </nav>
                 </div>

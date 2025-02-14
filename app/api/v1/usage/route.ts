@@ -64,64 +64,87 @@ export async function GET(req: NextRequest) {
             provider === "all"
                 ? Prisma.empty
                 : Prisma.sql`AND "provider" = ${provider}`;
+
         const modelAddon =
             model === "all" ? Prisma.empty : Prisma.sql`AND "model" = ${model}`;
-        const groupByStatement = groupByHours
-            ? Prisma.sql`DATE_TRUNC('hour', "createdAt")`
-            : Prisma.sql`DATE_TRUNC('day', "createdAt")`;
+
+        const intervalStatement = groupByHours
+            ? Prisma.sql`INTERVAL '1 hour'`
+            : Prisma.sql`INTERVAL '1 day'`;
 
         // Get daily costs with cache status within date range
         const dailyCosts = await prisma.$queryRaw<DailyCostRow[]>`
+           WITH RECURSIVE date_series AS (
+                SELECT DATE_TRUNC(${groupByHours ? "hour" : "day"}, ${startDate}::timestamp) as date
+                UNION ALL
+                SELECT date + ${intervalStatement}
+                FROM date_series
+                WHERE date < DATE_TRUNC(${groupByHours ? "hour" : "day"}, ${endDate}::timestamp)
+            ),
+            filtered_logs AS (
+                SELECT *
+                FROM "UsageLog"
+                WHERE 
+                    "userId" = ANY(${userIds}::text[])
+                    ${providerAddon}
+                    ${modelAddon}
+                    AND "createdAt" >= ${startDate}
+                    AND "createdAt" <= ${endDate}
+            )
             SELECT 
-                ${groupByStatement} as date,
-                COALESCE(SUM("cost"), 0) as total_cost,
-                COALESCE(SUM(CASE WHEN "cached" = true THEN "cost" ELSE 0 END), 0) as cached_cost,
-                COALESCE(SUM(CASE WHEN "cached" = false THEN "cost" ELSE 0 END), 0) as actual_cost,
-                COUNT(*) as total_requests,
-                COUNT(CASE WHEN "cached" = true THEN 1 END) as cached_requests,
-                COUNT(CASE WHEN "cached" = false THEN 1 END) as direct_requests
-            FROM "UsageLog"
-            WHERE 
-                "userId" = ANY(${userIds}::text[])
-                AND "createdAt" >= ${startDate}
-                AND "createdAt" <= ${endDate}
-                ${providerAddon}
-                ${modelAddon}
-            GROUP BY ${groupByStatement}
-            ORDER BY date ASC
+                series.date::timestamp as date,
+                COALESCE(SUM(fl."cost"), 0)::text as total_cost,
+                COALESCE(SUM(CASE WHEN fl."cached" = true THEN fl."cost" ELSE 0 END), 0)::text as cached_cost,
+                COALESCE(SUM(CASE WHEN fl."cached" = false THEN fl."cost" ELSE 0 END), 0)::text as actual_cost,
+                COALESCE(COUNT(fl."id"), 0)::text as total_requests,
+                COALESCE(COUNT(CASE WHEN fl."cached" = true THEN 1 END), 0)::text as cached_requests,
+                COALESCE(COUNT(CASE WHEN fl."cached" = false THEN 1 END), 0)::text as direct_requests
+            FROM date_series series
+            LEFT JOIN filtered_logs fl 
+                ON DATE_TRUNC(${groupByHours ? "hour" : "day"}, fl."createdAt") = series.date
+            GROUP BY series.date
+            ORDER BY series.date ASC
         `;
 
         // Transform the raw data into a more friendly format
-        const formattedStats: DailyStat[] = dailyCosts.map((day) => ({
-            date: day.date.toISOString().split(".")[0] + "Z",
-            metrics: {
-                total_cost: parseFloat(day.total_cost),
-                cached_cost: parseFloat(day.cached_cost),
-                actual_cost: parseFloat(day.actual_cost),
-                savings: parseFloat(day.cached_cost),
-                savings_percentage:
-                    parseFloat(day.total_cost) > 0
-                        ? (
-                              (parseFloat(day.cached_cost) /
-                                  parseFloat(day.total_cost)) *
-                              100
-                          ).toFixed(2)
-                        : "0.00",
-            },
-            requests: {
-                total: parseInt(day.total_requests),
-                cached: parseInt(day.cached_requests),
-                direct: parseInt(day.direct_requests),
-                cache_hit_rate:
-                    parseInt(day.total_requests) > 0
-                        ? (
-                              (parseInt(day.cached_requests) /
-                                  parseInt(day.total_requests)) *
-                              100
-                          ).toFixed(2)
-                        : "0.00",
-            },
-        }));
+        const formattedStats: DailyStat[] = dailyCosts
+            .map((day) => {
+                if (!day.date) {
+                    console.error("Received null date in dailyCosts");
+                    return null;
+                }
+                return {
+                    date: day.date.toISOString().split(".")[0] + "Z",
+                    metrics: {
+                        total_cost: parseFloat(day.total_cost),
+                        cached_cost: parseFloat(day.cached_cost),
+                        actual_cost: parseFloat(day.actual_cost),
+                        savings: parseFloat(day.cached_cost),
+                        savings_percentage:
+                            parseFloat(day.total_cost) > 0
+                                ? (
+                                      (parseFloat(day.cached_cost) /
+                                          parseFloat(day.total_cost)) *
+                                      100
+                                  ).toFixed(2)
+                                : "0.00",
+                    },
+                    requests: {
+                        total: parseInt(day.total_requests),
+                        cached: parseInt(day.cached_requests),
+                        direct: parseInt(day.direct_requests),
+                        cache_hit_rate:
+                            parseInt(day.total_requests) > 0
+                                ? (
+                                      (parseInt(day.cached_requests) /
+                                          parseInt(day.total_requests)) *
+                                      100
+                                  ).toFixed(2)
+                                : "0.00",
+                    },
+                };
+            })
+            .filter(Boolean) as DailyStat[];
 
         const rawLogs = await prisma.usageLog.findMany({
             where: {
@@ -136,6 +159,7 @@ export async function GET(req: NextRequest) {
             },
         });
 
+        let validEntriesCount = 0;
         const response: UsageResponse = {
             logs: rawLogs,
             analytics: {
@@ -161,14 +185,19 @@ export async function GET(req: NextRequest) {
                     average_cache_hit_rate:
                         formattedStats.length > 0
                             ? (
-                                  formattedStats.reduce(
-                                      (acc, day) =>
+                                  formattedStats.reduce((acc, day) => {
+                                      if (day.requests.total === 0) {
+                                          return acc;
+                                      }
+                                      validEntriesCount++;
+
+                                      return (
                                           acc +
                                           parseFloat(
                                               day.requests.cache_hit_rate
-                                          ),
-                                      0
-                                  ) / formattedStats.length
+                                          )
+                                      );
+                                  }, 0) / validEntriesCount
                               ).toFixed(2)
                             : "0.00",
                     total_requests: formattedStats.reduce(
