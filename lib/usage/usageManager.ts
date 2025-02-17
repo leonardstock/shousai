@@ -3,6 +3,7 @@ import {
     handleApiUsageLimitReachedEmail,
 } from "@/app/actions";
 import { prisma } from "../db/prisma";
+import { getSubscriptionTier } from "@/actions/subscriptions";
 
 export class UsageManager {
     static readonly TIER_LIMITS = {
@@ -27,24 +28,20 @@ export class UsageManager {
             where: { id: userId },
             select: {
                 organizationId: true,
-                subscription: { select: { tier: true } },
             },
         });
+
+        const subscriptionTier = await getSubscriptionTier(userId);
 
         const { organization } =
             await getOrganizationAndMembersFromUserId(userId);
 
-        if (
-            !user ||
-            !user.organizationId ||
-            !user.subscription ||
-            !organization
-        ) {
+        if (!user || !user.organizationId || !organization) {
             throw new Error("User, organization or subscription not found");
         }
 
-        const { organizationId, subscription } = user;
-        const tierLimits = this.TIER_LIMITS[subscription.tier];
+        const { organizationId } = user;
+        const tierLimits = this.TIER_LIMITS[subscriptionTier];
         const dailyLimit = tierLimits.dailyLimit;
         const monthlyLimit = tierLimits.monthlyLimit;
 
@@ -55,7 +52,7 @@ export class UsageManager {
             if (!organization.dailyApiCallLimitEmailSent) {
                 handleApiUsageLimitReachedEmail({
                     userId,
-                    tier: subscription.tier,
+                    tier: subscriptionTier,
                     daily: true,
                 });
             }
@@ -79,7 +76,7 @@ export class UsageManager {
             if (!organization.monthlyApiCallLimitEmailSent) {
                 handleApiUsageLimitReachedEmail({
                     userId,
-                    tier: subscription.tier,
+                    tier: subscriptionTier,
                     daily: false,
                 });
             }

@@ -1,5 +1,6 @@
 "use server";
 
+import { getSubscriptionTier } from "@/actions/subscriptions";
 import {
     ApiCallLimitReachedEmail,
     CustomSpendLimitReachedEmail,
@@ -18,63 +19,19 @@ interface UsageLogFilters {
     provider?: string;
 }
 
-export async function getSubscriptionTier(userId: string) {
+export async function getUserRole(userId: string) {
     try {
-        const subscription = await prisma.subscription.findFirst({
-            where: { userId: userId },
+        const user = await prisma.user.findUnique({
+            where: { id: userId },
             select: {
-                tier: true,
+                role: true,
             },
         });
 
-        return subscription?.tier;
+        return user?.role;
     } catch (error) {
         console.error(error);
-        return "FREE";
-    }
-}
-
-export async function upgradeUserSubscription(
-    userId: string,
-    stripeCustomerId?: string,
-    stripeSubscriptionId?: string
-) {
-    try {
-        return await prisma.subscription.update({
-            where: { userId },
-            data: {
-                tier: "PRO",
-                stripeCustomerId,
-                stripeSubscriptionId,
-                status: "active",
-                startDate: new Date(),
-            },
-        });
-    } catch (error) {
-        console.error("Error upgrading subscription:", error);
-        throw error;
-    }
-}
-
-export async function downgradeUserSubscription(
-    userId: string,
-    stripeCustomerId?: string,
-    stripeSubscriptionId?: string
-) {
-    try {
-        return await prisma.subscription.update({
-            where: { userId },
-            data: {
-                tier: "FREE",
-                stripeCustomerId,
-                stripeSubscriptionId,
-                status: "active",
-                startDate: new Date(),
-            },
-        });
-    } catch (error) {
-        console.error("Error downgrading subscription:", error);
-        throw error;
+        return null;
     }
 }
 
@@ -88,11 +45,7 @@ export async function getUserFromApiKey(apiKey: string) {
                 enabled: true,
             },
             include: {
-                user: {
-                    include: {
-                        subscription: true,
-                    },
-                },
+                user: true,
             },
         });
 
@@ -101,7 +54,6 @@ export async function getUserFromApiKey(apiKey: string) {
         return {
             userId: apiKeyRecord.userId,
             userDetails: apiKeyRecord.user,
-            subscription: apiKeyRecord.user.subscription,
         };
     } catch (error) {
         console.error("API Key Lookup Error:", error);
@@ -115,20 +67,21 @@ export async function getOrganizationUsageAndLimit(userId: string) {
             where: { id: userId },
             select: {
                 organizationId: true,
-                subscription: { select: { tier: true } },
             },
         });
 
-        if (!user || !user.organizationId || !user.subscription) {
+        const subscriptionTier = await getSubscriptionTier(userId);
+
+        if (!user || !user.organizationId) {
             throw new Error("User, organization or subscription not found");
         }
 
-        const { organizationId, subscription } = user;
+        const { organizationId } = user;
 
         const { dailyUsage, monthlyUsage } =
             await UsageManager.getOrganizationUsage(organizationId);
 
-        const tierLimits = UsageManager.TIER_LIMITS[subscription.tier];
+        const tierLimits = UsageManager.TIER_LIMITS[subscriptionTier];
         const dailyLimit = tierLimits.dailyLimit;
         const monthlyLimit = tierLimits.monthlyLimit;
 

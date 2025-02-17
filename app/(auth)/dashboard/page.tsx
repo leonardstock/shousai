@@ -159,10 +159,11 @@ const CostDashboard = () => {
                     </CardHeader>
                     <CardContent>
                         <div className='text-2xl font-bold'>
-                            {
-                                usageData?.analytics.summary
-                                    .average_cache_hit_rate
-                            }
+                            {usageData?.analytics.summary
+                                .average_cache_hit_rate === "NaN"
+                                ? "0"
+                                : usageData?.analytics.summary
+                                      .average_cache_hit_rate}
                             %
                         </div>
                     </CardContent>

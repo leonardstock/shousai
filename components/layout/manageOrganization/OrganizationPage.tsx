@@ -8,10 +8,10 @@ import LoadingIndicator from "@/components/shared/LoadingIndicator";
 import {
     deleteOrganization,
     getOrganizationAndMembersFromUserId,
-    getSubscriptionTier,
     updateOrganizationName,
     updateOrganizationSpendLimit,
 } from "@/app/actions";
+import { getSubscriptionTier } from "@/actions/subscriptions";
 
 const OrganizationPage = () => {
     const { createOrganization, setActive, userMemberships } =

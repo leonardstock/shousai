@@ -9,11 +9,12 @@ import {
 import { User } from "@prisma/client";
 import {
     getOrganizationAndMembersFromUserId,
-    getSubscriptionTier,
     removeMemberFromOrganization,
 } from "@/app/actions";
 import { Button } from "@/components/shared/Button";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
+import { getSubscriptionTier } from "@/actions/subscriptions";
+import UpgradeButton from "@/components/shared/UpgradeButton";
 
 export function OrganizationMembersList() {
     const { user } = useUser();
@@ -70,10 +71,13 @@ export function OrganizationMembersList() {
             </div>
             {isLoading && <LoadingIndicator />}
             {subscriptionTier === "FREE" && !isLoading && (
-                <div className='text-muted-foreground text-center'>
-                    Head over to Manage Subscription to upgrade to Pro tier and
-                    invite others to your team!
-                </div>
+                <>
+                    <div className='text-muted-foreground text-center'>
+                        Upgrade to shousai Pro now and invite others to your
+                        team!
+                    </div>
+                    <UpgradeButton />
+                </>
             )}
 
             {subscriptionTier !== "FREE" &&
