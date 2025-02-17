@@ -12,6 +12,7 @@ const CustomUserButton = () => {
     const { user } = useUser();
     const [isAdmin, setIsAdmin] = useState(true);
     const [isOnFreeTier, setIsOnFreeTier] = useState(true);
+    const userEmail = user?.emailAddresses[0].emailAddress;
 
     useEffect(() => {
         const checkRole = async () => {
@@ -39,7 +40,7 @@ const CustomUserButton = () => {
                                         width={"1rem"}
                                     />
                                 }
-                                href={`${process.env.NEXT_PUBLIC_UPGRADE_STRIPE_URL}`}></UserButton.Link>
+                                href={`${process.env.NEXT_PUBLIC_UPGRADE_STRIPE_URL}?prefilled_email=${encodeURI(userEmail!)}`}></UserButton.Link>
                         ) : (
                             <UserButton.Link
                                 label='Manage Subscription'
