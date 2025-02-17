@@ -13,7 +13,6 @@ const UpgradeButton = ({ buttonText }: { buttonText?: string }) => {
                 className='w-full block text-center bg-blue-500 text-white py-2 rounded-lg background-gradient font-bold'>
                 {buttonText ?? "Upgrade"}
             </a>
-            {userEmail}
         </div>
     );
 };
