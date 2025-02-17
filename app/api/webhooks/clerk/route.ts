@@ -52,7 +52,6 @@ export async function POST(req: Request) {
     const eventType = evt.type;
 
     if (eventType === "user.created") {
-        // const { id, email_addresses, ...attributes } = evt.data;
         const { id, email_addresses, first_name, last_name } = evt.data;
         const primaryEmail = email_addresses[0]?.email_address;
 
@@ -63,12 +62,6 @@ export async function POST(req: Request) {
                     firstName: first_name!,
                     lastName: last_name!,
                     email: primaryEmail,
-                    subscription: {
-                        create: {
-                            tier: "FREE",
-                            status: "active",
-                        },
-                    },
                 },
             });
 
@@ -132,6 +125,7 @@ export async function POST(req: Request) {
                 where: { id: id },
                 data: {
                     organizationId: id,
+                    role: "ADMIN",
                 },
             });
 
@@ -159,10 +153,19 @@ export async function POST(req: Request) {
             return new Response("Error updating organization", { status: 500 });
         }
     }
+
     if (eventType === "organization.deleted") {
         const { id } = evt.data;
 
         try {
+            await prisma.user.updateMany({
+                where: { organizationId: id },
+                data: {
+                    organizationId: null,
+                    role: null,
+                },
+            });
+
             await prisma.organization.delete({
                 where: { id: id },
             });
@@ -182,6 +185,7 @@ export async function POST(req: Request) {
                 where: { id: public_user_data.user_id },
                 data: {
                     organizationId: organization.id,
+                    role: "MEMBER",
                 },
             });
 
@@ -204,6 +208,7 @@ export async function POST(req: Request) {
                 where: { id: public_user_data.user_id },
                 data: {
                     organizationId: null,
+                    role: null,
                 },
             });
 
