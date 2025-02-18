@@ -8,7 +8,15 @@ const EmailTemplate = ({ children }: { children: React.ReactNode }) => (
             <div className='max-w-screen-xl mx-auto px-4 py-8'>
                 <div className='text-center mb-8 '>
                     <div className='logo '>
-                        shous<span className='logoAi'>ai</span>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                            src={
+                                "https://t7m9mjqxcznfonhc.public.blob.vercel-storage.com/icon_light_transparent.png"
+                            }
+                            width={100}
+                            height={100}
+                            alt='Shousai Logo'
+                        />
                     </div>
                 </div>
                 {children}
@@ -38,6 +46,26 @@ const CustomButton = ({
         {children}
     </Button>
 );
+
+export const SuggestionEmail = ({
+    message,
+    senderEmail,
+}: {
+    message: string;
+    senderEmail: string;
+}) => {
+    return (
+        <EmailTemplate>
+            <h1 className='text-2xl font-bold text-gray-900 mb-6'>
+                New Suggestion
+            </h1>
+            <div className='bg-gray-50 p-6 rounded-lg mb-8'>
+                <p className='text-gray-600'>{message}</p>
+                <p className='text-gray-600'>by {senderEmail}</p>
+            </div>
+        </EmailTemplate>
+    );
+};
 
 export const WelcomeEmail = ({ user }: { user: User }) => {
     const displayName = user.firstName || user.email.split("@")[0];

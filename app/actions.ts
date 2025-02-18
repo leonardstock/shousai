@@ -4,6 +4,7 @@ import { getSubscriptionTier } from "@/actions/subscriptions";
 import {
     ApiCallLimitReachedEmail,
     CustomSpendLimitReachedEmail,
+    SuggestionEmail,
 } from "@/components/email/Templates";
 import { prisma } from "@/lib/db/prisma";
 import { sendEmail } from "@/lib/emails/emailUtils";
@@ -17,6 +18,21 @@ interface UsageLogFilters {
     dateTo?: Date;
     model?: string;
     provider?: string;
+}
+
+export async function sendSuggestionEmail(
+    message: string,
+    senderEmail: string
+) {
+    try {
+        await sendEmail({
+            to: ["leo.stock@live.de"],
+            subject: "Feature Suggestion",
+            body: SuggestionEmail({ message, senderEmail }),
+        });
+    } catch (error) {
+        console.error("Error sending suggestion email:", error);
+    }
 }
 
 export async function getUserRole(userId: string) {

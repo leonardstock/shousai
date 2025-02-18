@@ -3,10 +3,10 @@
 import { Menu, X } from "lucide-react";
 import { useCallback, useState } from "react";
 import { Dialog, DialogPanel } from "@headlessui/react";
-import { SignedIn, SignedOut, SignInButton } from "@clerk/nextjs";
 import Link from "next/link";
 import CustomUserButton from "../CustomUserButton";
 import { usePathname, useRouter } from "next/navigation";
+import FeedbackPopover from "@/components/FeedbackPopover";
 
 export default function TopBar() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -46,19 +46,9 @@ export default function TopBar() {
                     </button>
                 </div>
                 <div className='hidden lg:flex lg:flex-1 lg:justify-end'>
-                    <div className={`flex flex-row`}>
-                        <>
-                            <SignedOut>
-                                <SignInButton>
-                                    <button className='background-gradient text-white items-center lg:px-6 px-4 py-2 rounded-lg'>
-                                        Sign In
-                                    </button>
-                                </SignInButton>
-                            </SignedOut>
-                            <SignedIn>
-                                <CustomUserButton />
-                            </SignedIn>
-                        </>
+                    <div className={`flex flex-row gap-4`}>
+                        <FeedbackPopover />
+                        <CustomUserButton />
                     </div>
                 </div>
             </nav>
@@ -113,8 +103,11 @@ export default function TopBar() {
                                 </div>
                             </div>
                             <div className='py-6'>
-                                <div className={`flex flex-row gap-4`}>
-                                    <CustomUserButton />
+                                <div className={`flex flex-col gap-4`}>
+                                    <FeedbackPopover />
+                                    <div>
+                                        <CustomUserButton />
+                                    </div>
                                 </div>
                             </div>
                         </div>
