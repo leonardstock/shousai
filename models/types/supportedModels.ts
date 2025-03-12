@@ -1,4 +1,4 @@
-// TODO: write an ai agent that automatically pulls the pricing data from the above object every 2 hours
+// TODO: write an ai agent that automatically pulls the pricing data from the above object every day or so
 export type Provider = "openai" | "anthropic";
 
 export type ModelPricing = {
@@ -8,7 +8,6 @@ export type ModelPricing = {
 };
 
 export const MODEL_PRICING: Record<string, ModelPricing> = {
-    // OpenAI Models
     "gpt-4o": {
         provider: "openai",
         input: 0.0025,
@@ -44,7 +43,6 @@ export const MODEL_PRICING: Record<string, ModelPricing> = {
         input: 0.0015,
         output: 0.002,
     },
-    // Anthropic Models
     "claude-3-opus-20240229": {
         provider: "anthropic",
         input: 0.015,

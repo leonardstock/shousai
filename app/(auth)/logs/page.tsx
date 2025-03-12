@@ -2,7 +2,7 @@
 
 import { getOrganizationUsageLogsFromUserId } from "@/app/actions";
 import LoadingIndicator from "@/components/shared/LoadingIndicator";
-import { DateRange } from "@/models/types/dateRange";
+// import { DateRange } from "@/models/types/dateRange";
 import { Provider } from "@/models/types/provider";
 import {
     HUMAN_READABLE_NAMES,
@@ -10,14 +10,14 @@ import {
 } from "@/models/types/supportedModels";
 import { useUser } from "@clerk/nextjs";
 import { UsageLog } from "@prisma/client";
-import { Brain, Building2, Calendar } from "lucide-react";
+import { Brain, Building2 } from "lucide-react";
 import { useEffect, useState } from "react";
 
 const LogsPage = () => {
     const [isLoading, setIsLoading] = useState<boolean>(true);
     const [usageLogs, setUsageLogs] = useState<UsageLog[]>([]);
     // const [searchTerm, setSearchTerm] = useState<string>("");
-    const [timeRange, setTimeRange] = useState<DateRange>("week");
+    // const [timeRange, setTimeRange] = useState<DateRange>("week");
     const [provider, setProvider] = useState<Provider>("all");
     const [model, setModel] = useState<string>("all");
     const { user } = useUser();
@@ -86,7 +86,8 @@ const LogsPage = () => {
                             ))}
                         </select>
                     </div>
-                    <div className='flex items-center gap-2'>
+                    {/* WIP */}
+                    {/* <div className='flex items-center gap-2'>
                         <Calendar className='h-4 w-4' />
                         <select
                             value={timeRange}
@@ -99,7 +100,7 @@ const LogsPage = () => {
                             <option value='month'>Last Month</option>
                             <option value='year'>Last Year</option>
                         </select>
-                    </div>
+                    </div> */}
                 </div>
             </div>
             <div className='overflow-x-auto rounded-lg'>
