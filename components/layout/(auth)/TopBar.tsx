@@ -48,7 +48,9 @@ export default function TopBar() {
                 <div className='hidden lg:flex lg:flex-1 lg:justify-end'>
                     <div className={`flex flex-row gap-4`}>
                         <FeedbackPopover />
-                        <CustomUserButton />
+                        <div className='flex items-center'>
+                            <CustomUserButton />
+                        </div>
                     </div>
                 </div>
             </nav>
