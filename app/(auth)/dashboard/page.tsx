@@ -62,7 +62,7 @@ async function fetchUsageData(
 
 const CostDashboard = () => {
     const { organization } = useOrganization();
-    const [timeRange, setTimeRange] = useState<DateRange>("week");
+    const [timeRange, setTimeRange] = useState<DateRange>("month");
     const [usageData, setUsageData] = useState<UsageResponse>();
     const [provider, setProvider] = useState<Provider>("all");
     const [model, setModel] = useState<string>("all");
